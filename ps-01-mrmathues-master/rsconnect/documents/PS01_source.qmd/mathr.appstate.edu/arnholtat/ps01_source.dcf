@@ -1,0 +1,14 @@
+name: ps01_source
+title: PS01_source
+username: arnholtat
+account: arnholtat
+server: mathr.appstate.edu
+hostUrl: https://mathr.appstate.edu/connect/__api__
+appId: 5
+bundleId: 17
+url: https://mathr.appstate.edu/connect/content/668e8670-bd72-4454-95e0-471051cd8ccc/
+version: 1
+quarto_version: 1.3.353
+quarto_engines: knitr
+asMultiple: FALSE
+asStatic: FALSE

@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Max Mathues">
+
+<title>Problem Set 07</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="PS07_source_files/libs/clipboard/clipboard.min.js"></script>
+<script src="PS07_source_files/libs/quarto-html/quarto.js"></script>
+<script src="PS07_source_files/libs/quarto-html/popper.min.js"></script>
+<script src="PS07_source_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="PS07_source_files/libs/quarto-html/anchor.min.js"></script>
+<link href="PS07_source_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="PS07_source_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="PS07_source_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="PS07_source_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="PS07_source_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="PS07_source.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Problem Set 07</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Max Mathues </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">Last modified on October 04, 2023 23:05:57 Eastern Daylight Time</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="background" class="level1">
+<h1>Background</h1>
+<p>For this exercise, we will mimic the tactile sampling you did in class with virtual sampling. We will use some data from the <a href="http://gss.norc.org/">general social survey</a>, an annual personal-interview survey conducted in the United States. The survey is designed to monitor changes in both social characteristics and attitudes.</p>
+<p>The <strong>population</strong> of interest will be <strong>ALL</strong> 2538 individuals living in a single neighborhood in 2014. As an analogy to the tactile sampling you did in class, the neighborhood is the “bowl” and the 2538 people are the little balls.</p>
+<p>If you get stuck as you are working through this Problem Set, we <strong>strongly recommend</strong> you re-read <a href="https://moderndive.com/7-sampling.html#sampling-definitions">Chapter 7</a> in <a href="https://moderndive.com/index.html">ModernDive</a>, in particular subsections 7.3.1 on <a href="https://moderndive.com/7-sampling.html#terminology-and-notation">“Terminology &amp; notation”</a> and 7.3.2 on <a href="https://moderndive.com/7-sampling.html#sampling-definitions">“Statistical definitions”</a>. These terminology, notation, and definitions related to sampling are definitely tricky at first; the best method to master them is practice, practice, practice.</p>
+<section id="key-points-on-symbols" class="level3">
+<h3 class="anchored" data-anchor-id="key-points-on-symbols">Key points on symbols:</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>POPULATION PARAMETER</th>
+<th>SAMPLE STATISTIC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Number of cases</td>
+<td><span class="math inline">\(N\)</span></td>
+<td><span class="math inline">\(n\)</span></td>
+</tr>
+<tr class="even">
+<td>Proportion</td>
+<td><span class="math inline">\(p\)</span></td>
+<td><span class="math inline">\(\hat{p}\)</span></td>
+</tr>
+<tr class="odd">
+<td>Standard error</td>
+<td><span class="math inline">\(SE\)</span></td>
+<td><span class="math inline">\(\widehat{SE}\)</span></td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sym <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Number of cases"</span>, <span class="st">"Proportion"</span>, <span class="st">"Standard error"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>PP <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"$N$"</span>, <span class="st">"$p$"</span>, <span class="st">"$SE$"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>SS <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"$n$"</span>, <span class="st">"$</span><span class="sc">\\</span><span class="st">hat{p}$"</span>, <span class="st">"$</span><span class="sc">\\</span><span class="st">widehat{SE}$"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>DF <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">sym =</span> sym, <span class="at">PP =</span> PP, <span class="at">SS =</span> SS)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(DF, <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Symbol"</span>, <span class="st">"Population Parameter"</span>, </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"Sample Statistic"</span>), </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">caption =</span> <span class="st">"Key Points on Symbols"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Key Points on Symbols</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Symbol</th>
+<th style="text-align: left;">Population Parameter</th>
+<th style="text-align: left;">Sample Statistic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Number of cases</td>
+<td style="text-align: left;"><span class="math inline">\(N\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(n\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Proportion</td>
+<td style="text-align: left;"><span class="math inline">\(p\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\hat{p}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Standard error</td>
+<td style="text-align: left;"><span class="math inline">\(SE\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\widehat{SE}\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<p>First load the necessary packages:</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forcats)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(moderndive)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<p>You can load and and view the <code>gss_cat</code> data set from the <code>forcats</code> package using the code below:</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(gss_cat)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(gss_cat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 21,483
+Columns: 9
+$ year    &lt;int&gt; 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 20…
+$ marital &lt;fct&gt; Never married, Divorced, Widowed, Never married, Divorced, Mar…
+$ age     &lt;int&gt; 26, 48, 67, 39, 25, 25, 36, 44, 44, 47, 53, 52, 52, 51, 52, 40…
+$ race    &lt;fct&gt; White, White, White, White, White, White, White, White, White,…
+$ rincome &lt;fct&gt; $8000 to 9999, $8000 to 9999, Not applicable, Not applicable, …
+$ partyid &lt;fct&gt; "Ind,near rep", "Not str republican", "Independent", "Ind,near…
+$ relig   &lt;fct&gt; Protestant, Protestant, Protestant, Orthodox-christian, None, …
+$ denom   &lt;fct&gt; "Southern baptist", "Baptist-dk which", "No denomination", "No…
+$ tvhours &lt;int&gt; 12, NA, 2, 4, 1, NA, 3, NA, 0, 3, 2, NA, 1, NA, 1, 7, NA, 3, 3…</code></pre>
+</div>
+</div>
+</div>
+</div>
+<p>Be sure to examine the data in the <strong>viewer</strong>. Type <code>?gss_cat</code> in the <strong>console</strong> to see a description of the variables in this data set.</p>
+</section>
+</section>
+<section id="exploratory-data-wrangling" class="level1">
+<h1>Exploratory Data Wrangling</h1>
+<p>This data set includes many of years of data and many variables. To start, we will restrict our analysis to only 2014, and to only the variable indicating the <code>marital</code> status of each respondent.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>YEAR</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2014</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>gss_YEAR <span class="ot">&lt;-</span> gss_cat <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> YEAR) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(marital)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<p>The following shows the different responses for <code>marital</code> status:</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>gss_YEAR  <span class="sc">%&gt;%</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(marital) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 1
+  marital      
+  &lt;fct&gt;        
+1 Divorced     
+2 Married      
+3 Never married
+4 Separated    
+5 Widowed      
+6 No answer    </code></pre>
+</div>
+</div>
+</div>
+</div>
+<section id="setting-a-seed" class="level2">
+<h2 class="anchored" data-anchor-id="setting-a-seed">Setting a Seed</h2>
+<p><strong>Setting a seed:</strong> We will take some random samples in this Problem Set. In order to make sure <code>R</code> takes the same random sample every time you run your code, you can do what is called “setting a seed”. Do this in any code chunk where you take a random sample.</p>
+<p>You can set a seed with any number.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">45</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="the-true-population-proportion-p-of-divorced-people" class="level1">
+<h1>The True Population Proportion <span class="math inline">\(p\)</span> of Divorced People</h1>
+<p>Again, for this exercise, the <strong>population</strong> of interest will be <strong>ALL</strong> 2538 individuals living in this single neighborhood in 2014. Since we have data on <strong>ALL</strong> 2538 people living in the neighborhood, we can compute the <strong>exact population proportion</strong> <span class="math inline">\(p\)</span> of divorced people directly using <strong>ALL</strong> the data as follows:</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>gss_YEAR <span class="sc">%&gt;%</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">divorced =</span> <span class="fu">sum</span>(marital <span class="sc">==</span> <span class="st">"Divorced"</span>), </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">N =</span> <span class="fu">n</span>(), <span class="at">p2 =</span> <span class="fu">mean</span>(marital <span class="sc">==</span> <span class="st">"Divorced"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p =</span> divorced <span class="sc">/</span> N) <span class="ot">-&gt;</span> ans</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>ans</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 4
+  divorced     N    p2     p
+     &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
+1      411  2538 0.162 0.162</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Or</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>(p <span class="ot">&lt;-</span> <span class="fu">mean</span>(gss_YEAR<span class="sc">$</span>marital<span class="sc">==</span><span class="st">"Divorced"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1619385</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>We use <span class="math inline">\(N\)</span> for the size of the full population of 2538 people, and <span class="math inline">\(p\)</span> because we are calculating the TRUE population proportion <span class="math inline">\(p\)</span>.</p></li>
+<li><p>Inference to the population is not needed. We do not need to use a <strong>sample</strong> to try to infer something about the <strong>true population proportion</strong> <span class="math inline">\(p\)</span> of divorced people in this neighborhood in 2014. We know that <span class="math inline">\(p = 0.1619385\)</span>.</p></li>
+</ul>
+</div>
+</div>
+<p>In other words, this problem set is not a realistic reflection of a real life problem. However, for this problem set, we are <em>simulating</em> the act of sampling from this neighborhood population to understand and study how factors like sample size influence <strong>sampling variation</strong>.</p>
+</section>
+<section id="demo-sampling-50-people-in-the-neighborhood" class="level1">
+<h1>Demo: Sampling 50 People in the Neighborhood</h1>
+<section id="estimating-hatp-from-a-single-sample" class="level2">
+<h2 class="anchored" data-anchor-id="estimating-hatp-from-a-single-sample">Estimating <span class="math inline">\(\hat{p}\)</span> from a Single Sample</h2>
+<p>We are first going to use random sampling to <strong>ESTIMATE</strong> the true <strong>population</strong> proportion <span class="math inline">\(p\)</span> of the neighborhood that are divorced with only a <strong>sample</strong> of 50 people.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This will represent a situation of only having the resources to knock on 50 doors to get responses from people in this neighborhood!</p>
+</div>
+</div>
+<p>Be sure to look at the results in the viewer. Remember, you can set the seed to whatever value you like. For this exercise, use a four digit seed that is your birth month and day. For example, if your birthday is on Halloween then you will use the seed 1031.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">0804</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>n50_1rep <span class="ot">&lt;-</span> gss_YEAR <span class="sc">%&gt;%</span> </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rep_sample_n</span>(<span class="at">size =</span> <span class="dv">50</span>, <span class="at">reps =</span> <span class="dv">1</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(n50_1rep)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+# Groups:   replicate [1]
+  replicate marital      
+      &lt;int&gt; &lt;fct&gt;        
+1         1 Never married
+2         1 Never married
+3         1 Married      
+4         1 Never married
+5         1 Never married
+6         1 Married      </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># OR </span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">0421</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>n50_sample <span class="ot">&lt;-</span> <span class="fu">sample</span>(gss_YEAR<span class="sc">$</span>marital, <span class="at">size =</span> <span class="dv">50</span>, <span class="at">replace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(n50_sample)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] Never married Divorced      Married       Married       Married      
+[6] Married      
+Levels: No answer Never married Separated Divorced Widowed Married</code></pre>
+</div>
+</div>
+</div>
+</div>
+<p>Next, let’s calculate the <strong>sample proportion</strong> <span class="math inline">\(\hat{p}\)</span> of people who identified as <code>Divorced</code> in our sample of 50 people.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>ans1 <span class="ot">&lt;-</span> n50_1rep <span class="sc">%&gt;%</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">divorce_count =</span> <span class="fu">sum</span>(marital <span class="sc">==</span> <span class="st">"Divorced"</span>), </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">phat =</span> <span class="fu">mean</span>(marital <span class="sc">==</span> <span class="st">"Divorced"</span>),</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_hat =</span> divorce_count<span class="sc">/</span> n)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>ans1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 5
+  replicate divorce_count  phat     n p_hat
+      &lt;int&gt;         &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;
+1         1             6  0.12    50  0.12</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># OR</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>(phat <span class="ot">&lt;-</span> <span class="fu">mean</span>(n50_sample<span class="sc">==</span><span class="st">"Divorced"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.18</code></pre>
+</div>
+</div>
+</div>
+</div>
+<p>This sample proportion <span class="math inline">\(\hat{p}\)</span> is an <strong>ESTIMATE</strong>, and our <strong>best guess</strong> of what the <strong>true population</strong> proportion <span class="math inline">\(p\)</span> of <code>Divorced</code> people is in this neighborhood, based on a sample of only <span class="math inline">\(50\)</span> people. The estimate (<span class="math inline">\(\hat{p} = 0.12\)</span>) is reasonably close to the true population proportion <span class="math inline">\(p =0.1619385\)</span> we calculated from the full population.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 1">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 1
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Ask two of your classmates what their estimate of <span class="math inline">\(\hat{p}\)</span> was. How do the <span class="math inline">\(\hat{p}\)</span> estimates from different samples compare?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 1 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 1 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>Their p-hat values were within .1 of mine, which is 0.18.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 2">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 2
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Why</strong> did everyone get a different estimate?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 2 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 2 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>Everyone got a different estimate because the computer is using a probability algorithm to predict how many people out of 50 are divorced. It is predicting numbers like 5/50 or 6/50, but it differs seed to seed.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="estimating-widehatse-from-a-single-sample" class="level2">
+<h2 class="anchored" data-anchor-id="estimating-widehatse-from-a-single-sample">Estimating <span class="math inline">\(\widehat{SE}\)</span> from a Single Sample</h2>
+<p>Typically we only have the opportunity to collect <strong>one sample</strong> for our study. Consequently, we have to use the amount of variability in our <strong>single sample</strong> as an estimate of the amount of variability we might expect in our results if we had taken a random sample of 50 different people. The <span class="math inline">\(\widehat{SE}_{\hat{p}}\)</span> serves as an <strong>ESTIMATE</strong> of <strong>sampling variability</strong> if you only have a <strong>single sample</strong>. The formula for estimating the standard error of <span class="math inline">\(\hat{p}\)</span> is given in (<a href="#eq-se">Equation&nbsp;1</a>).</p>
+<p><span id="eq-se"><span class="math display">\[
+\widehat{SE}_{\hat{p}}  \approx  \sqrt{\frac{\hat{p} \times (1-\hat{p})}{n}}
+\tag{1}\]</span></span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note that we use <span class="math inline">\(n\)</span> for the size of the sample, that p “wears a hat”, like so: <span class="math inline">\(\hat{p}\)</span> because we are ESTIMATING a proportion based on only a sample, and that the SE “wears a hat” as well because we are ESTIMATING <span class="math inline">\(SE\)</span> based on only a sample.</p>
+</div>
+</div>
+<p>The standard error of <span class="math inline">\(\hat{p}\)</span> can be estimated in <code>R</code> as follows:</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>n50_1rep <span class="sc">%&gt;%</span> </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">divorce_count =</span> <span class="fu">sum</span>(marital <span class="sc">==</span> <span class="st">"Divorced"</span>), </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_hat =</span> divorce_count<span class="sc">/</span> n, </span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">se_hat =</span> <span class="fu">sqrt</span>(p_hat <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p_hat) <span class="sc">/</span> n)) <span class="ot">-&gt;</span> n50_1rep_ans</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>n50_1rep_ans</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 5
+  replicate divorce_count     n p_hat se_hat
+      &lt;int&gt;         &lt;int&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1         1             6    50  0.12 0.0460</code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="demo-generating-a-sampling-distribution-of-hatp" class="level1">
+<h1>Demo: Generating a Sampling Distribution of <span class="math inline">\(\hat{p}\)</span></h1>
+<p>If you ran the code chunk that takes a random sample of 50 cases a thousand more times….and wrote down every <span class="math inline">\(\hat{p}\)</span> you got, you would have what is called a simulated “sampling distribution”.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A sampling distribution shows every [or nearly every!] possible result a sampling statistic can have under every [or nearly every!] possible sample <strong>of a given sample size</strong> from a population.</p>
+</div>
+</div>
+<section id="simulated-sampling-distribution-of-hatp-for-n-50" class="level2">
+<h2 class="anchored" data-anchor-id="simulated-sampling-distribution-of-hatp-for-n-50">Simulated Sampling Distribution of <span class="math inline">\(\hat{p}\)</span> for <span class="math inline">\(n = 50\)</span></h2>
+<p>Instead of running the sampling code chunk for <span class="math inline">\(n = 50\)</span> over and over, we can “collect” 1000 samples of <span class="math inline">\(n = 50\)</span> easily with <code>R</code>. The following code chunk takes 1000 <strong>different</strong> samples of <span class="math inline">\(n = 50\)</span> and stores them in the data frame <code>n50_1000rep</code>:</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">19</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>n50_1000rep <span class="ot">&lt;-</span> gss_YEAR <span class="sc">%&gt;%</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rep_sample_n</span>(<span class="at">size =</span> <span class="dv">50</span>, <span class="at">reps =</span> <span class="dv">1000</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(n50_1000rep)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+# Groups:   replicate [1]
+  replicate marital      
+      &lt;int&gt; &lt;fct&gt;        
+1         1 Divorced     
+2         1 Never married
+3         1 Never married
+4         1 Widowed      
+5         1 Married      
+6         1 Widowed      </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Consider a different approach</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">19</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>reps <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>phat <span class="ot">&lt;-</span> <span class="fu">numeric</span>(reps)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>reps){</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>   ss <span class="ot">&lt;-</span> <span class="fu">sample</span>(gss_YEAR<span class="sc">$</span>marital, <span class="at">size =</span> <span class="dv">50</span>, <span class="at">replace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>   phat[i] <span class="ot">&lt;-</span> <span class="fu">mean</span>(ss <span class="sc">==</span> <span class="st">"Divorced"</span>)</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(phat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.08 0.10 0.16 0.18 0.20 0.10</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>n50_1000rep</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 50,000 × 2
+# Groups:   replicate [1,000]
+   replicate marital      
+       &lt;int&gt; &lt;fct&gt;        
+ 1         1 Divorced     
+ 2         1 Never married
+ 3         1 Never married
+ 4         1 Widowed      
+ 5         1 Married      
+ 6         1 Widowed      
+ 7         1 Married      
+ 8         1 Widowed      
+ 9         1 Separated    
+10         1 Married      
+# ℹ 49,990 more rows</code></pre>
+</div>
+</div>
+</div>
+</div>
+<p>Be sure to look at <code>n50_1000rep</code> in the data viewer to get a sense of these 1000 samples look like.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 3">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 3
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What is the name of the column that identifies which of the 1000 samples each row is from?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 3 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 3 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>The column is named replicate.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 4">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 4
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What is the sample size <span class="math inline">\(n\)</span> for each of the <span class="math inline">\(1000\)</span> samples we took? (i.e.&nbsp;how many humans are sampled in each replicate)?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 4 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 4 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>The sample size is 50.</li>
+</ul>
+</div>
+</div>
+</div>
+<p>The following code chunk calculates the sample proportion <span class="math inline">\(\hat{p}\)</span> of people who reported they were divorced for each of the <strong>1000 samples</strong>.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>p_hat_n50_1000rep <span class="ot">&lt;-</span> n50_1000rep <span class="sc">%&gt;%</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(replicate) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">divorce_count =</span> <span class="fu">sum</span>(marital <span class="sc">==</span> <span class="st">"Divorced"</span>), </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_hat =</span> divorce_count <span class="sc">/</span> n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<p>Examine the first five rows of the results:</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>p_hat_n50_1000rep <span class="sc">%&gt;%</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+  replicate divorce_count     n p_hat
+      &lt;int&gt;         &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
+1         1             4    50  0.08
+2         2             5    50  0.1 
+3         3             8    50  0.16
+4         4             9    50  0.18
+5         5            10    50  0.2 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Or</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>p_hat_n50_1000rep <span class="sc">%&gt;%</span> </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+  replicate divorce_count     n p_hat
+      &lt;int&gt;         &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
+1         1             4    50  0.08
+2         2             5    50  0.1 
+3         3             8    50  0.16
+4         4             9    50  0.18
+5         5            10    50  0.2 </code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="visualize-the-sampling-distribution-of-hatp-for-n-50" class="level2">
+<h2 class="anchored" data-anchor-id="visualize-the-sampling-distribution-of-hatp-for-n-50">Visualize the Sampling Distribution of <span class="math inline">\(\hat{p}\)</span> for <span class="math inline">\(n = 50\)</span></h2>
+<p>We can plot the <strong>sampling distribution</strong> of these 1000 <span class="math inline">\(\hat{p}\)</span> estimates of divorced respondents with a histogram using the code below.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># histogram of phat using ggplot2</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(p_hat_n50_1000rep, <span class="fu">aes</span>(<span class="at">x =</span> p_hat)) <span class="sc">+</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="fl">0.02</span>, <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">fill =</span> <span class="st">"aquamarine3"</span>) <span class="sc">+</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Sample proportion of divorced respondents"</span>, </span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Sampling distribution of p_hat based on n = 50"</span>) <span class="sc">+</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="sc">-</span><span class="fl">0.05</span>, <span class="fl">0.6</span>) <span class="ot">-&gt;</span> hist1</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>hist1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-n50" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="PS07_source_files/figure-html/fig-n50-1.png" class="img-fluid figure-img" width="768"></p>
+<figcaption class="figure-caption">Figure&nbsp;1: Simulated sampling distribution of p_hat based on 1000 samples of size 50 created with <code>ggplot2</code></figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># hist of phat using base R</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(phat, <span class="at">main =</span> <span class="st">"Sampling distribution of phat based on n = 50"</span>, </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">"aquamarine3"</span>, <span class="at">breaks =</span> <span class="dv">15</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-n50base" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="PS07_source_files/figure-html/fig-n50base-1.png" class="img-fluid figure-img" width="768"></p>
+<figcaption class="figure-caption">Figure&nbsp;2: Simulated sampling distribution of p_hat based on 1000 samples of size 50 created with base <code>R</code></figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 5">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 5
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Based on <a href="#fig-n50">Figure&nbsp;1</a> and <a href="#fig-n50base">Figure&nbsp;2</a>, what appears to be a very common value of <span class="math inline">\(\hat{p}\)</span>? What is a very uncommon value? Specifically, find the 1%, 99%, the mean, and the standard deviation of the values stored in <code>p_hat</code> to help answer the question.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 5 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 5 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments below</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>p_hat_n50_1000rep <span class="sc">%&gt;%</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">quantile</span>(p_hat, <span class="fu">c</span>(<span class="fl">0.01</span>, <span class="fl">0.99</span>)), mean1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(p_hat), sdev <span class="ot">&lt;-</span> <span class="fu">sd</span>(p_hat))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 3
+  `quantile(p_hat, c(0.01, 0.99))` `mean1 &lt;- mean(p_hat)` `sdev &lt;- sd(p_hat)`
+                             &lt;dbl&gt;                  &lt;dbl&gt;               &lt;dbl&gt;
+1                             0.06                  0.162              0.0522
+2                             0.3                   0.162              0.0522</code></pre>
+</div>
+</div>
+<ul>
+<li>The 1% is .06, the 99% is .30, the mean is .1615, and the standard deviation is .05236117.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="mean-and-standard-error-of-the-sampling-distribution-of-hatp-for-n-50" class="level2">
+<h2 class="anchored" data-anchor-id="mean-and-standard-error-of-the-sampling-distribution-of-hatp-for-n-50">Mean and Standard Error of the Sampling Distribution of <span class="math inline">\(\hat{p}\)</span> for <span class="math inline">\(n = 50\)</span></h2>
+<p>We can estimate the mean of the sampling distribution by calculating the mean of all 1000 <span class="math inline">\(\hat{p}\)</span> estimates, and the standard error of the sampling distribution by calculating the standard deviation of all 1000 <span class="math inline">\(\hat{p}\)</span> values as follows:</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>p_hat_n50_1000rep <span class="sc">%&gt;%</span> </span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(M_p_hat <span class="ot">&lt;-</span> <span class="fu">mean</span>(p_hat), </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>            SE_p_hat <span class="ot">&lt;-</span> <span class="fu">sd</span>(p_hat))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  `M_p_hat &lt;- mean(p_hat)` `SE_p_hat &lt;- sd(p_hat)`
+                     &lt;dbl&gt;                   &lt;dbl&gt;
+1                    0.162                  0.0522</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 6">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 6
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>How do the values computed in the above code chunk compare to the estimates we got for <span class="math inline">\(\hat{p}\)</span> and <span class="math inline">\(\widehat{SE}_{\hat{p}}\)</span> for <code>Divorced</code> respondents based on your <strong>single</strong> sample of 50 people earlier in this Problem Set?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 6 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 6 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>The values are the same as our earlier estimates.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 7">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 7
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use the <code>rep_sample_n</code> function to collect 1000 virtual samples of size <span class="math inline">\(n = 15\)</span>. Store the 1000 virtual samples in an object named <code>n15_1000rep</code>. Use a seed of 910.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 7 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 7 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">910</span>)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>n15_1000rep <span class="ot">&lt;-</span> gss_YEAR <span class="sc">%&gt;%</span> </span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rep_sample_n</span>(<span class="at">size =</span> <span class="dv">15</span>, <span class="at">reps =</span> <span class="dv">1000</span>)</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>n15_1000rep</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 15,000 × 2
+# Groups:   replicate [1,000]
+   replicate marital      
+       &lt;int&gt; &lt;fct&gt;        
+ 1         1 Married      
+ 2         1 Never married
+ 3         1 Widowed      
+ 4         1 Married      
+ 5         1 Married      
+ 6         1 Divorced     
+ 7         1 Married      
+ 8         1 Married      
+ 9         1 Married      
+10         1 Married      
+# ℹ 14,990 more rows</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 8">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 8
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Calculate sample proportion <span class="math inline">\(\hat{p}\)</span> of people who reported they were <code>Divorced</code> for each replicate of your <span class="math inline">\(n = 15\)</span> sampling. Store the results in <code>ques8</code> and display the first six rows of <code>ques8</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 8 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-34-contents" aria-controls="callout-34" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 8 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-34" class="callout-34-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>ques8 <span class="ot">&lt;-</span> n15_1000rep <span class="sc">%&gt;%</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(replicate) <span class="sc">%&gt;%</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">divorced =</span> <span class="fu">sum</span>(marital <span class="sc">==</span> <span class="st">"Divorced"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_hat =</span> divorced<span class="sc">/</span><span class="dv">15</span>)</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ques8)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  replicate divorced  p_hat
+      &lt;int&gt;    &lt;int&gt;  &lt;dbl&gt;
+1         1        2 0.133 
+2         2        2 0.133 
+3         3        1 0.0667
+4         4        4 0.267 
+5         5        2 0.133 
+6         6        1 0.0667</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 9">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 9
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Visualize the sampling distribution of <span class="math inline">\(\hat{p}\)</span> from your <span class="math inline">\(n = 15\)</span> sampling with a purple histogram.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 9 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-36-contents" aria-controls="callout-36" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 9 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-36" class="callout-36-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ques8, <span class="fu">aes</span>(<span class="at">x =</span> p_hat)) <span class="sc">+</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">fill =</span> <span class="st">"purple"</span>) <span class="sc">+</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Sample proportion of divorced respondents"</span>, </span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Sampling distribution of p_hat based on n = 15"</span>) <span class="sc">+</span></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-n15" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="PS07_source_files/figure-html/fig-n15-1.png" class="img-fluid figure-img" width="768"></p>
+<figcaption class="figure-caption">Figure&nbsp;3: Simulated sampling distribution of p_hat based on samples of size 15</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 10">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 10
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Calculate the mean of the <span class="math inline">\(n = 15\)</span> sampling distribution, and the standard error of the <span class="math inline">\(n = 15\)</span> sampling distribution.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 10 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-38-contents" aria-controls="callout-38" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 10 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-38" class="callout-38-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>ques8 <span class="sc">%&gt;%</span> </span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(Mean_p_hat <span class="ot">&lt;-</span> <span class="fu">mean</span>(p_hat), sd_p_hat <span class="ot">&lt;-</span> <span class="fu">sd</span>(p_hat))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  `Mean_p_hat &lt;- mean(p_hat)` `sd_p_hat &lt;- sd(p_hat)`
+                        &lt;dbl&gt;                   &lt;dbl&gt;
+1                       0.162                  0.0948</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 11">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 11
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>How does the standard error of the <span class="math inline">\(n = 15\)</span> sampling distribution compare to the standard error of the <span class="math inline">\(n = 50\)</span> sampling distribution?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 11 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-40-contents" aria-controls="callout-40" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 11 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-40" class="callout-40-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>There appears to be a difference of 0.0425383</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 12">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 12
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Explain any observed differences from 11.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 12 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-42-contents" aria-controls="callout-42" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 12 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-42" class="callout-42-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>There is a smaller sample size with the n=15 group than the n=50 group, so the margin of error is larger.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 13">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 13
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use the <code>rep_sample_n</code> function to collect 1000 virtual samples of size <span class="math inline">\(n = 600\)</span>. Store the 1000 virtual samples in an object named <code>n600_1000rep</code>. Use a seed of 84.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 13 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-44-contents" aria-controls="callout-44" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 13 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-44" class="callout-44-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">84</span>)</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>n600_1000rep <span class="ot">&lt;-</span> gss_YEAR <span class="sc">%&gt;%</span> </span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rep_sample_n</span>(<span class="at">size =</span> <span class="dv">600</span>, <span class="at">reps =</span> <span class="dv">1000</span>)</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>n600_1000rep</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 600,000 × 2
+# Groups:   replicate [1,000]
+   replicate marital      
+       &lt;int&gt; &lt;fct&gt;        
+ 1         1 Married      
+ 2         1 Never married
+ 3         1 Married      
+ 4         1 Never married
+ 5         1 Widowed      
+ 6         1 Married      
+ 7         1 Married      
+ 8         1 Divorced     
+ 9         1 Divorced     
+10         1 Married      
+# ℹ 599,990 more rows</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 14">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 14
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Calculate the proportion <span class="math inline">\(\hat{p}\)</span> of people who reported they were <code>Divorced</code>for each replicate of your <span class="math inline">\(n = 600\)</span> sampling. Store the results in <code>ques14</code> and display the first six rows of <code>ques14</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 14 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-46-contents" aria-controls="callout-46" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 14 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-46" class="callout-46-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>ques14 <span class="ot">&lt;-</span> n600_1000rep <span class="sc">%&gt;%</span> </span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(replicate) <span class="sc">%&gt;%</span> </span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">divorced =</span> <span class="fu">sum</span>(marital <span class="sc">==</span> <span class="st">"Divorced"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_hat =</span> divorced<span class="sc">/</span><span class="dv">600</span>)</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ques14)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  replicate divorced p_hat
+      &lt;int&gt;    &lt;int&gt; &lt;dbl&gt;
+1         1      105 0.175
+2         2      100 0.167
+3         3      102 0.17 
+4         4      107 0.178
+5         5       93 0.155
+6         6       98 0.163</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 15">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 15
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Calculate the mean of the <span class="math inline">\(n = 600\)</span> sampling distribution, and the standard error of the <span class="math inline">\(n = 600\)</span> sampling distribution.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 15 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-48-contents" aria-controls="callout-48" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 15 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-48" class="callout-48-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and answers below</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>ques14 <span class="sc">%&gt;%</span> </span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(Mean_p_hat <span class="ot">&lt;-</span> <span class="fu">mean</span>(p_hat), sd_p_hat <span class="ot">&lt;-</span> <span class="fu">sd</span>(p_hat))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  `Mean_p_hat &lt;- mean(p_hat)` `sd_p_hat &lt;- sd(p_hat)`
+                        &lt;dbl&gt;                   &lt;dbl&gt;
+1                       0.162                  0.0133</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 16">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 16
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Was there more <strong>variability</strong> from sample to sample when we took a sample size of 600 or a sample size of 50? <strong>Explain what evidence you have for assessing this</strong>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 16 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-50-contents" aria-controls="callout-50" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 16 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-50" class="callout-50-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>The variance is higher in the sample with a size of 50, because the standard deviation is observed to be higher.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 17">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 17
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Which sampling distribution looked more normally distributed (bell shaped and symmetrical); the one built on <span class="math inline">\(n\)</span> = 15, 50 or 600? <strong>Why?</strong></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 17 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-52-contents" aria-controls="callout-52" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 17 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-52" class="callout-52-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>The one built on n = 600 will look the most normally distributed because it contains the largest amount of data and the standard deviation is the lowest.</li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments below</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ques14, <span class="fu">aes</span>(<span class="at">x =</span> p_hat)) <span class="sc">+</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">fill =</span> <span class="st">"skyblue"</span>) <span class="sc">+</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Sample proportion of divorced respondents"</span>, </span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Sampling distribution of p_hat based on n = 600"</span>) <span class="sc">+</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="PS07_source_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="estimating-hatp-and-the-standard-error-of-hatp-from-a-single-sample-revisited" class="level2">
+<h2 class="anchored" data-anchor-id="estimating-hatp-and-the-standard-error-of-hatp-from-a-single-sample-revisited">Estimating <span class="math inline">\(\hat{p}\)</span> and the Standard Error of <span class="math inline">\(\hat{p}\)</span> from a Single Sample (revisited)</h2>
+<p>In most instances, we do not have access to the full population as we did in this GSS data; instead we have to take a <strong>sample</strong> to try to say something about the <strong>larger population</strong>. Furthermore, in the real world, we typically only take a <strong>single</strong> sample from the population, due to time or money constraints.</p>
+<p>So how do we <strong>ESTIMATE</strong> a <span class="math inline">\(\hat{p}\)</span> and a standard error of <span class="math inline">\(\hat{p}\)</span> when we only have a single sample, and not 1000 repeated samples? As demonstrated at the very beginning of the Problem Set we:</p>
+<ul>
+<li>estimate <span class="math inline">\(\hat{p}\)</span> from the sample</li>
+<li>use the formula for the standard error of <span class="math inline">\(\hat{p}\)</span> given in (<a href="#eq-se">Equation&nbsp;1</a>) and repeated below to estimate SE based on a single sample</li>
+</ul>
+<p><span class="math display">\[\widehat{SE}_{\hat{p}}  \approx  \sqrt{\frac{\hat{p} \times (1-\hat{p})}{n}}\]</span></p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 18">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 18
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Imagine we collected only a single small sample of 15 respondents as given from the code below.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">53</span>)</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>n15_1rep <span class="ot">&lt;-</span> gss_YEAR <span class="sc">%&gt;%</span> </span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rep_sample_n</span>(<span class="at">size =</span> <span class="dv">15</span>, <span class="at">reps =</span> <span class="dv">1</span>)</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a><span class="co"># and</span></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>n50_1rep <span class="ot">&lt;-</span> gss_YEAR <span class="sc">%&gt;%</span> </span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rep_sample_n</span>(<span class="at">size =</span> <span class="dv">50</span>, <span class="at">reps =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Following the example from the beginning of the Problem Set (roughly line 138), estimate the <strong>sample proportion</strong> <span class="math inline">\(\hat{p}\)</span> of people who identified as <code>Divorced</code> based on <code>n15_1rep</code>… AS WELL AS the <strong>standard error of</strong> <span class="math inline">\(\hat{p}\)</span>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 18 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-54-contents" aria-controls="callout-54" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 18 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-54" class="callout-54-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">53</span>)</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>n15_1rep <span class="ot">&lt;-</span> gss_YEAR <span class="sc">%&gt;%</span> </span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rep_sample_n</span>(<span class="at">size =</span> <span class="dv">15</span>, <span class="at">reps =</span> <span class="dv">1</span>)</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>n15_1rep <span class="sc">%&gt;%</span></span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">p_hat =</span> <span class="fu">sum</span>(marital <span class="sc">==</span> <span class="st">"Divorced"</span>)<span class="sc">/</span><span class="fu">n</span>(), <span class="at">se_hat =</span> <span class="fu">sqrt</span>(p_hat <span class="sc">*</span> (<span class="dv">1</span><span class="sc">-</span>p_hat)<span class="sc">/</span><span class="fu">n</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  replicate p_hat se_hat
+      &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1         1 0.267  0.114</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You should have gotten a value reasonably close to the estimate we made earlier from our sampling distribution for <span class="math inline">\(n = 15\)</span>! Note that when you must estimate a standard error from <strong>only a single sample</strong>, the formula <strong>contains the sample size, n</strong>. The larger the sample size n, the larger the number in the denominator of the SE formula.</p>
+</div>
+</div>
+<p>Fill in the Markdown table below with all the standard errors you computed for this problem set. In other words:</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 19">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 19
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>Replace <code>x</code> with the standard error you obtained by taking the standard deviation of the <span class="math inline">\(n = 15\)</span> sampling distribution. Replace <code>a</code> with the standard error you obtained for a single sample of <span class="math inline">\(n = 15\)</span> using the mathematical formula.</p></li>
+<li><p>When you are done, make sure all the <code>|</code> in the table still line up so your results print out in a table!</p></li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 19 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-57-contents" aria-controls="callout-57" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 19 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-57" class="callout-57-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<table class="table">
+<colgroup>
+<col style="width: 24%">
+<col style="width: 41%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Sample size n</th>
+<th>SE via sd of sampling distribution</th>
+<th>SE via one sample and formula</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>15</td>
+<td>0.09475327</td>
+<td>0.1141798</td>
+</tr>
+<tr class="even">
+<td>50</td>
+<td>0.052215</td>
+<td>0.05433231</td>
+</tr>
+</tbody>
+</table>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Your code below</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">53</span>)</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>n50_1rep <span class="ot">&lt;-</span> gss_YEAR <span class="sc">%&gt;%</span> </span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rep_sample_n</span>(<span class="at">size =</span> <span class="dv">50</span>, <span class="at">reps =</span> <span class="dv">1</span>)</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>n50_1rep <span class="sc">%&gt;%</span></span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">p_hat =</span> <span class="fu">sum</span>(marital <span class="sc">==</span> <span class="st">"Divorced"</span>)<span class="sc">/</span><span class="fu">n</span>(), <span class="at">se_hat =</span> <span class="fu">sqrt</span>(p_hat <span class="sc">*</span> (<span class="dv">1</span><span class="sc">-</span>p_hat)<span class="sc">/</span><span class="fu">n</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  replicate p_hat se_hat
+      &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1         1  0.18 0.0543</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">53</span>)</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>n600_1rep <span class="ot">&lt;-</span> gss_YEAR <span class="sc">%&gt;%</span> </span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rep_sample_n</span>(<span class="at">size =</span> <span class="dv">600</span>, <span class="at">reps =</span> <span class="dv">1</span>)</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>n600_1rep <span class="sc">%&gt;%</span></span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">p_hat =</span> <span class="fu">sum</span>(marital <span class="sc">==</span> <span class="st">"Divorced"</span>)<span class="sc">/</span><span class="fu">n</span>(), <span class="at">se_hat =</span> <span class="fu">sqrt</span>(p_hat <span class="sc">*</span> (<span class="dv">1</span><span class="sc">-</span>p_hat)<span class="sc">/</span><span class="fu">n</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  replicate p_hat se_hat
+      &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1         1 0.145 0.0144</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 20">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 20
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Based on what you observed for 19, <strong>IF</strong> you collected a single sample from 600 respondents, do you think the standard error will be smaller or larger than the one you calculated for <span class="math inline">\(n = 15\)</span>. <strong>Explain your reasoning</strong>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 20 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-59-contents" aria-controls="callout-59" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 20 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-59" class="callout-59-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>The standard deviation should be smaller with the single sample of 600 respondents because it will have a much larger sample size to pull from.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="turning-in-your-work" class="level1">
+<h1>Turning in Your Work</h1>
+<p>You will need to make sure you commit and push all of your changes to the github education repository where you obtained the lab.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Make sure you <strong>render a final copy with all your changes</strong> and work.</li>
+<li>Look at your final html file to make sure it contains the work you expect and is formatted properly.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="logging-out-of-the-server" class="level1">
+<h1>Logging out of the Server</h1>
+<p>There are many statistics classes and students using the Server. To keep the server running as fast as possible, it is best to sign out when you are done. To do so, follow all the same steps for closing Quarto document:</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Save all your work.</li>
+<li>Click on the orange button in the far right corner of the screen to quit <code>R</code></li>
+<li>Choose <strong>don’t save</strong> for the <strong>Workspace image</strong></li>
+<li>When the browser refreshes, you can click on the sign out next to your name in the top right.</li>
+<li>You are signed out.</li>
+</ul>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.2.3 (2023-03-15)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Red Hat Enterprise Linux 9.2 (Plow)
+
+Matrix products: default
+BLAS/LAPACK: /usr/lib64/libopenblasp-r0.3.21.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] moderndive_0.5.5 forcats_1.0.0    dplyr_1.1.3      ggplot2_3.4.3   
+[5] knitr_1.44      
+
+loaded via a namespace (and not attached):
+ [1] pillar_1.9.0         compiler_4.2.2       tools_4.2.2         
+ [4] digest_0.6.33        timechange_0.2.0     lubridate_1.9.3     
+ [7] jsonlite_1.8.7       evaluate_0.22        lifecycle_1.0.3     
+[10] tibble_3.2.1         gtable_0.3.4         pkgconfig_2.0.3     
+[13] rlang_1.1.1          cli_3.6.1            rstudioapi_0.15.0   
+[16] yaml_2.3.7           xfun_0.40            fastmap_1.1.1       
+[19] stringr_1.5.0        janitor_2.2.0        withr_2.5.1         
+[22] generics_0.1.3       vctrs_0.6.3          htmlwidgets_1.6.2   
+[25] grid_4.2.2           tidyselect_1.2.0     snakecase_0.11.1    
+[28] glue_1.6.2           R6_2.5.1             fansi_1.0.4         
+[31] rmarkdown_2.25       farver_2.1.1         infer_1.0.5         
+[34] purrr_1.0.2          tidyr_1.3.0          magrittr_2.0.3      
+[37] operator.tools_1.6.3 formula.tools_1.7.1  backports_1.4.1     
+[40] scales_1.2.1         htmltools_0.5.6      colorspace_2.1-0    
+[43] labeling_0.4.3       utf8_1.2.3           stringi_1.7.12      
+[46] munsell_0.5.0        broom_1.0.5         </code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

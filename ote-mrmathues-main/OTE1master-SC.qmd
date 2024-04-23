@@ -1,0 +1,232 @@
+---
+title: "Opportunity to Excel # 1"
+author: "Max Mathues"
+date: last-modified
+date-format: "[Last modified on] MMMM DD, YYYY HH:mm:ss zzz"
+format: 
+  html: default
+  pdf: default
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = NA, warning = FALSE, message = FALSE, fig.align = "center")
+library(scales)
+```
+
+::: callout-note
+**By committing and pushing this Quiz to the class repository you are acknowledging the all work is your own accept as noted in your acknowledgement statement at the end of the document. Please commit and push your work to the class repository no later than 2:00 pm, Thursday October 12, 2023.**
+:::
+
+::: {.callout-note icon="false" title="Problem 1 (4 pts.)"}
+Load the `tidyverse` and `fst` packages.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 1 Answers (4 pts.)"}
+```{r}
+# Your Code Here
+library(tidyverse)
+library(fst)
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 2 (6 pts.)"}
+Read into `R` the data set `late_shipments.fst` stored in the `data` directory using the `read.fst()` function and store the results in `late_shipments`. Verify programmatically that the dimensions of `late_shipments` are 1000 by 26.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 2 Answers (6 pts.)"}
+```{r}
+# Your Code Here
+late_shipments <- read.fst("~/git_repository/ote-mrmathues/data/late_shipments.fst")
+ncol(late_shipments)
+nrow(late_shipments)
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 3 (8 pts.)"}
+Create a subset of `late_shipments` named `late_shipments_air` where the `shipment_mode` is `"Air"` and the `country` is `"Vietnam"`. The dimensions of `late_shipments_air` should be 135 by 26. Use `late_shipments_air` for Problems 4 through 8. Verify programmatically that the dimensions of `late_shipments_air` are 135 by 26.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 3 Answers (8 pts.)"}
+```{r}
+# Your Code Here
+late_shipments_air <- late_shipments %>%
+  filter(shipment_mode == "Air", country == "Vietnam")
+ncol(late_shipments_air)
+nrow(late_shipments_air)
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 4 (10 pts.)"}
+Create a scatterplot of `freight_cost_usd` versus `weight_kilograms` mapping `sub_classification` to `color` using the `late_shipments_air` data frame. Superimpose least squares regression lines on the scatterplot. Make sure to replace computer labels with descriptive labels. **Extra Credit (3 pts):** Make the `Adult` least squares regression line `darkgreen` and the `Pediatric` least squares regression line `pink`.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 4 Answers (10 pts.)"}
+```{r}
+#| label: "fig-q4"
+#| fig-cap: "Scatterplot of freight cost in US dollars versus weight (kilograms)"
+# Your Code Here
+plot(1:10,10:1)
+ggplot(late_shipments_air, aes(x = weight_kilograms, y = freight_cost_usd, color = sub_classification))+ geom_point()+ 
+geom_smooth(method ="lm", se =FALSE)+
+  scale_color_manual(values = c("Adult"="darkgreen","Pediatric"="pink"))+ 
+  xlab("Weight in kilograms")+ 
+  ylab("Freight Cost in USD")+ 
+  ggtitle("Freight Cost vs Weight")
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 5 (10 pts.)"}
+Based on the scatterplot you created in @fig-q4, do you think it is appropriate to use a parallel slopes model or a non-additive (interaction) model? Please explain your rationale.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 5 Answers (10 pts.)"}
+**Your answer here:**
+I think that a parallel slopes model would be appropriate because the scatterplot indicates that the relationship is roughly the same between freight cost and weight in both the adult and pediatric subclassification.
+```{r}
+# Your code here
+# 3 pts
+
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 6 (10 pts.)"}
+Create histograms of `freight_cost_usd` by `sub_classification` such that the histogram for `Adult` is displayed on top of the histogram for `Pediatric`. Set the `binwidth` to 500 and use your favorite color for the `fill` argument. (Hint: `facet_grid()`)
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 6 Answers (10 pts.)"}
+```{r}
+#| label: "fig-q6"
+#| fig-cap: "Histograms of freight cost in US dollars"
+# Your Code Here
+plot(1:10,10:1)
+asdf1 <- ggplot(late_shipments_air, aes(x = freight_cost_usd, fill = sub_classification)) + 
+  geom_histogram(binwidth =500, position ="identity", alpha =0.5) + 
+  facet_grid(sub_classification ~ .,switch="y") + 
+  scale_fill_manual(values =c("Adult"="skyblue","Pediatric"="maroon")) + 
+  labs(x ="Freight Cost in USD", y ="Frequency") + 
+  theme_minimal()
+asdf1
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 7 (12 pts.)"}
+Characterize the distribution of `freight_cost_usd` for `Adult`.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 7 Answers (12 pts.)"}
+```{r}
+# Your Code Here
+# 3 pts.
+asdf2 <- ggplot(late_shipments_air, aes(x = freight_cost_usd)) + 
+  geom_histogram(binwidth =500) + 
+  labs(x ="Freight Cost in USD for Adults", y ="Frequency") + theme_bw()
+asdf2
+```
+
+**Your answer here:** The graph appears to be skewed right, asymmetrical, and highly variable.
+:::
+
+::: {.callout-note icon="false" title="Problem 8 (9 pts.)"}
+Create a parallel slopes model for regressing `freight_cost_usd` on to `weight_kilograms` for the different levels in `sub_classification`. Store the result in `mod_ps`.
+
+-   Report and interpret the slope of the model.
+-   What is the model's $y-$intercept for `Pediatric` shipments?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 8 Answers"}
+```{r}
+# Your Code Here
+# 3 pts.
+mod_ps <- lm(freight_cost_usd ~ weight_kilograms + sub_classification, data = late_shipments_air)
+mod_ps
+```
+
+**Your answers here:**
+
+-   The y-intercept for Pediatric shipments is `r 3251.434-1455.383`.
+
+-   The slope is 1.986.
+:::
+
+::: {.callout-note icon="false" title="Problem 9 (15 pts.)"}
+Given that 8% of all shipments from Vietnam are late, what is the probability at least 90% of the next $n = 500$ shipments will be on time?
+
+-   Define your random variable and specify its distribution before writing a mathematical statement and showing the code you use to obtain an answer.
+-   What is expected value and standard deviation of your random variable?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 9 Answers (15 pts.)"}
+**Your answers here:**
+
+-   The random variable y-hat is normal
+
+-   Mathematical Statement: The probability of at least 90% of the next shipment making it on time is 95.03699%.
+
+-   The standard deviation is .0121326
+
+-   The expected value is .08
+
+-   
+
+```{r}
+# Your code here
+# 5 pts
+# What is the probability that at least 90% will be on time?
+mean = 0.08
+y_hat <- (sd = sqrt(mean * (1 - mean) * (1/500)))
+y_hat
+probability <- pnorm(0.10, 0.08, y_hat)
+probability
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 10 (8 pts.)"}
+A gambler has in his pocket a fair coin and a two-headed coin. He selects one of the coins at random; when he flips it, it shows heads. What is the probability it is the fair coin? Show all work!
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 10 Answers (8 pts.)"}
+-   The probability of it being a fair coin is 1/3
+
+-   Bayes formula: ((1/2)(1/2))/((1/2)(1/2)+1(1/2)), you can also find that it is 1/3 by taking all of the heads from the two coins and seeing that it totals 3, and only one of which belongs to the fair coin.
+
+```{=tex}
+\begin{aligned}
+
+\end{aligned}
+```
+**Your text answer here:** 1/3 or 33.33%
+:::
+
+::: {.callout-note icon="false" title="Problem 11 (8 pts.)"}
+A coin is tossed 25 times. Let $x=$ the number of tosses that result in heads ($H$). Consider the following rule for deciding whether or not the coin is fair. Judge the coin to be fair if $8\leq X \leq 17$. Judge the coin to be biased if either $X \leq 7$ or $X \geq 18$. What is the probability of judging the coin to be biased when it is actually fair?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 11 Answers (8 pts.)"}
+```{r}
+# Your Code Here
+asdf3 <- dbinom(18, 25, .5) +
+  dbinom(19, 25, .5) +
+  dbinom(20, 25, .5) +
+  dbinom(21, 25, .5) +
+  dbinom(22, 25, .5) +
+  dbinom(23, 25, .5) +
+  dbinom(24, 25, .5) +
+  dbinom(25, 25, .5)
+
+asdf4 <- dbinom(7, 25, .5) +
+  dbinom(6, 25, .5) +
+  dbinom(5, 25, .5) +
+  dbinom(4, 25, .5) +
+  dbinom(3, 25, .5) +
+  dbinom(2, 25, .5) +
+  dbinom(1, 25, .5) +
+  dbinom(0, 25, .5)
+
+asdf5 <- asdf3 + asdf4
+```
+
+**Your answer here:** The probability of judging the coin to be biased is `r asdf5*(10^2)`%
+:::
+
+**Acknowledgement Statement: All work on this quiz is entirely my own.**

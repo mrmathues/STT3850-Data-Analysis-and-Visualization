@@ -1,0 +1,386 @@
+---
+title: "Problem Set 04: Linear Regression"
+author: "Max Mathues"
+date: last-modified
+date-format: "[Last modified on] MMMM DD, YYYY HH:mm:ss zzz"
+format: 
+  html: default
+  pdf: default
+editor: visual
+---
+
+```{r include = FALSE}
+# Do not edit this code block/chunk!
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center", comment = NA, message = FALSE,  warning = FALSE, fig.width = 16/2, fig.height = 9/2)
+```
+
+# Background
+
+For this problem set you will first run through an example of a simple linear regression, answering a few questions on the way. Then you will work through a regression analysis independently. Knit this file...and you can read through all the instructions.
+
+We will look at some demographic data from the `fivethirtyeight` package recorded for 48 voting areas in the US states just after the 2016 presidential election. We will investigate what variables within those regions might be tied to the percentage of US voters that supported Donald Trump, and in turn, which variables might be useful to predict Trump support in other regions (i.e. to a wider US population).
+
+# Setup
+
+## Load Packages
+
+We will read the data in with the `readr` package, explore the data using the `dplyr` package and visualize the data using the `ggplot2` package. The `moderndive` package includes some nice functions to show regression model outputs.
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(moderndive)
+```
+:::
+
+## The Data
+
+The following uses the function `read_csv()` to read a `*.CSV` file of the data from where it is published on the web.
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+url <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vT8qHdvTPaRc62hU94ShBcSh04HP3c11b6XZIPMiUDGuwPtifpP7QhHdSHS2YgTRMRTgfUmBYq-L3ZT/pub?gid=1217616678&single=true&output=csv"
+if(!dir.exists("./data/")){
+  dir.create("./data/")
+}
+if(!file.exists("./data/trump.csv")){
+    download.file(url, destfile = "./data/trump.csv")}
+trump <- read_csv("./data/trump.csv")
+```
+:::
+
+Take a moment to look at the data in the viewer or by using `glimpse()`.
+
+```{r}
+glimpse(trump)
+```
+
+The explanatory variables include:
+
+-   `hs_ed` - the percentage of the adults in the region with a high school education.
+-   `poverty`- the percentage of the "white" households in the region in poverty.
+-   `non_white`- the percentage of humans in a region that identify as a person of color.
+
+The outcome variable `trump_support` is the percentage of votes for Trump in 2016 in each region.
+
+Observe that all percentages are expressed as values between 0 and 100, and not 0 and 1.
+
+# An Example/Demo
+
+## Visualization
+
+We will start by investigating the relationship between white poverty levels and support for Trump.
+
+We'll do this by creating a scatterplot with `trump_support` as the outcome variable on the y-axis and `poverty` as the explanatory variable on the x-axis. Note the use of the `geom_smooth()` function, that tells `R` to add a regression line. While the points do scatter/vary around the blue regression line, of all possible lines we can draw in this point of clouds, the blue line is the "best-fitting" line in that in minimizes the sum of the squared residuals.
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+#| label: "fig-TSG"
+#| fig-cap: "Percentage of voters supporting Trump versus the percentage of white households in poverty."
+#| fig-width: 4
+#| fig-height: 3
+ggplot(data = trump, aes(y = trump_support, x = poverty)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x = "Percentage of white households in poverty", 
+       y = "Percentage of voters supporting Trump", 
+       title = "Trump support and white poverty in the US") +
+  theme_bw() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 1"}
+Does the relationship in @fig-TSG appear to be positive or negative? Does the relationship in @fig-TSG look reasonably linear?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 1 Answers"}
+-   It is a positive relationship, although it is relatively weak. I would say that it is not reasonably linear.
+:::
+
+## The Correlation Coefficient (r)
+
+We can numerically quantify the strength of the linear relationship between the two variables with the correlation coefficient. The following tells `R` to `summarize()` the correlation coefficient between the numerical variables `poverty` and `trump_support`. Note that the correlation coefficient only exists for pairs of numerical variables.
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r }
+trump %>%
+  summarise(r = cor(trump_support, poverty))
+# Or
+trump %>% get_correlation(trump_support ~ poverty) 
+```
+:::
+
+## Running a Linear Regression Model
+
+In `R` we can fit a linear regression model (a regression line), like so:
+
+::: callout-note
+```{r m1}
+poverty_mod <- lm(trump_support ~ poverty, data = trump)
+```
+
+Note that:
+
+-   the function `lm()` is short for "linear model"
+-   the first argument is a *formula* in the form `y ~ x` or in other words `outcome variable ~ explantory variable`.\
+-   the second argument is the data frame in which the outcome and explanatory variables can be found.
+-   we **SAVED THE MODEL RESULTS** as an object called `poverty_mod`
+
+This object `poverty_mod` contains all of the information we need about the linear model that was just fit and we'll be accessing this information again later.
+:::
+
+## Get the Regression Table
+
+The `get_regression_table()` function from the `moderndive` package will output a regression table. Let's focus on the value in the second column: an estimate for 1) an intercept, and 2) a slope for the `poverty` variable. We'll revisit what the other columns mean in a future problem set.
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+get_regression_table(poverty_mod)
+kable(get_regression_table(poverty_mod))
+# I prefer
+kable(summary(poverty_mod)$coef)
+```
+:::
+
+We can interpret the `intercept` and `poverty` slope like so:
+
+-   When the poverty level is 0, the predicted average Trump support is `r round(coef(poverty_mod)[1],2)`%.
+-   For every increase in poverty level of 1 percentage point, there is an **associated increase** in Trump support of `r round(coef(poverty_mod)[2],2)` percentage points.
+
+Revisiting the @fig-TSG, we can see that the best-fit line hits the y axis at `r round(coef(poverty_mod)[1],2)` (if we extend it). This is the intercept...the y value at which poverty = 0 (note, a value that is not close to the range of values for "percentage of white households in poverty").
+
+```{r}
+#| fig-height: 3
+#| fig-width: 5
+#| echo: false
+#| label: fig-ts
+#| fig-cap: "Trump support and white poverty in the US"
+ggplot(data = trump, aes(y = trump_support, x = poverty))+ 
+  geom_point() +
+  coord_cartesian(xlim = c(0, 20), ylim = c(0, 80)) +
+  labs(x = "Percentage of white households in poverty", 
+       y = "Percentage of voters supporting Trump", 
+       title = "Trump support and white poverty in the US") + 
+  geom_abline(slope = 2.0591, intercept = 30.8064, col = "black", lwd = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, col = "red", lwd = 2 ) +
+  theme_bw() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+::: {.callout-note icon="false" title="Problem 2"}
+We found a positive correlation coefficient between `trump_support` and `poverty`. Is it reasonable for us to conclude that social policies that increase white poverty will **cause** an increase in Trump support? Explain why or why not?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 2 Answers"}
+-   I think that by looking strictly at the data, it would be reasonable to assume that increases in poverty would lead to increases in Trump support. This is backed up by the graph showing that with a higher percentage of white households in poverty, there is a higher percentage of voters supporting Trump.
+:::
+
+## Making Predictions
+
+Based on the `R` output of our model, the following is our least squares regression line for the linear model:
+
+$$\widehat{\text{trump\_support}} = `r round(coef(poverty_mod)[1],4)` + `r round(coef(poverty_mod)[2],4)` \times \text{poverty}$$
+
+We can use the least squares regression line of the `trump_support` versus `poverty` relationship (See @fig-ts) to **visually** make predictions. For instance at 15% white poverty, the line shows a value of just over 60% Trump support.
+
+To get a **more accurate** prediction, we could actually plug 15% into the regression equation like so:
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+y_hat = 30.8064 + 2.0591 * 15
+y_hat
+# Or better yet
+predict(poverty_mod, newdata = data.frame(poverty = 15))
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 3"}
+What percent of Trump support would you expect at a value of 6% white poverty?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 3 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+y_hat = 30.8064 + 2.0591 * 6
+y_hat
+```
+
+-   I would expect `r y_hat`% of voters to support Trump.
+:::
+
+::: {.callout-note icon="false" title="Problem 4"}
+Do you think it is a good idea to predict Trump support at 85% white poverty, based on this regression equation? Explain your reasoning. Look at @fig-ts carefully before answering the question.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 4 Answers"}
+-   It would not be a good idea because real life data is not linear, which means that at 85% it will not be a reasonable figure.
+:::
+
+## Residuals
+
+Recall that model residuals are the difference between the **observed values in your data set** and the **values predicted by the line**:
+
+$$\text{residual} = y - \hat{y}$$
+
+For instance, below, one data point is highlighted in blue...the residual is the difference between the y value of the **data point** (here 69), and the y value **predicted** by the line (roughly 59). Here the residual is roughly 10 ($69 - 59 = 10$). The regression equation has under-estimated Trump support, compared to this data point.
+
+```{r}
+#| fig-height: 2.5
+#| fig-width: 4
+#| echo: false
+ggplot(data = trump, aes(y = trump_support, x = poverty))+ 
+  geom_point() +  
+  geom_segment(x = 14, y = 69, xend = 14, yend = 59.634, col = "blue") + 
+  geom_point(data=subset(trump, trump_support == 69), colour = "blue", size = 4) + 
+  labs(x = "Percentage of white households in poverty", 
+       y = "Percentage of voters supporting Trump", 
+       title = "Trump support and white poverty in the US") + 
+  geom_smooth(method = "lm", se = FALSE, col = "red", lwd = 2) +
+  theme_bw() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+The function `get_regression_points()` provides the **fitted** also known as **predicted** value for every data point, and the **residual** for every data point. The first row in the output is the first data point...you see that Trump support was 30%, white poverty was 7%, the regression equation predicted 45.22% Trump support, and the residual was $-15.22 = (30 - 45.22)$.
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+results <- get_regression_points(poverty_mod)
+kable(head(results))
+```
+:::
+
+## Put your Skills to Practice Independently!
+
+Use the same `trump` data set for the following questions:
+
+::: {.callout-note icon="false" title="Problem 5"}
+Generate a scatterplot with a best-fitting line with `non_white` as the explanatory variable, and `trump_support` as the response. Be sure to include an informative title and axis labels for your plot. This will help contextualize the plot.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 5 Answers"}
+```{r}
+ggplot(data = trump, aes(y = trump_support, x = non_white))+ 
+  geom_point() +  
+  geom_point() + 
+  labs(x = "Percentage of non-white voters", 
+       y = "Percentage of voters supporting Trump", 
+       title = "Trump support and non-white voters in the US") + 
+  geom_smooth(method = "lm", se = FALSE, col = "red", lwd = 2) +
+  theme_bw()
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 6"}
+Do you expect the correlation coefficient (for `non_white` and `trump_support`) to be positive or negative? Write a code chunk testing your prediction (it is OK if your expectation was wrong!).
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 6 Answers"}
+-   Based on the graph I just created, I expect it to be negative.
+
+```{r}
+# Type your code and comments inside the code chunk
+trump %>% get_correlation(trump_support ~ non_white) 
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 7"}
+Run a linear regression using `non_white` as the **explanatory** variable, and `trump_support` as the **outcome** variable. Store your linear model in the object `nw_mod`. Use the `get_regression_table()` function on `nw_mod` and interpret the intercept and slope estimates.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 7 Answers"}
+```{r}
+nw_mod <- lm(trump_support ~ non_white, data = trump)
+get_regression_table(nw_mod)
+
+```
+
+-   When the non-white level is 0, the predicted average Trump support is 58.328%.
+
+-   For every increase in non-white of 1 percentage point, there is an associated decrease in Trump support of .269 percentage points.
+:::
+
+::: {.callout-note icon="false" title="Problem 8"}
+Make a numerical prediction for the level of trump support for a region that has 70% of humans that identify as a person of color. In other words, use **math** not a visual prediction.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 8 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+trump_support_hat <- 58.328 - .269 * 70
+trump_support_hat
+# Just to double check
+predict(nw_mod, newdata = data.frame(non_white = 70))
+```
+
+-   There would be roughly `r trump_support_hat`% of voters in support of Trump.
+:::
+
+::: {.callout-note icon="false" title="Problem 9"}
+Based on the evidence you have so far (scatterplots and correlation coefficients), which of the explanatory variables we have considered (`non_white` or `poverty`) seems to be a better explanatory variable of Trump support? Explain.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 9 Answers"}
+```{r}
+trump %>% get_correlation(trump_support ~ poverty) 
+trump %>% get_correlation(trump_support ~ non_white) 
+```
+
+-   I consider non_white to be the better explanatory variable, because the correlation coefficient is closer to 0, and it works better with larger percentage predictions.
+:::
+
+::: {.callout-note icon="false" title="Problem 10"}
+If Representative Ocasio-Cortez saw the regression line (`nw_mod`) and not the actual data:
+
+**A.** What would her prediction of Trump support be for a region in which 61% of the people identify as non-white?
+
+**B.** Would her prediction be an overestimate or an underestimate (compared to the observed data), and by how much?
+
+**C.** In other words, what is the residual for this prediction?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 10 Answers"}
+```{r}
+asdf <- predict(nw_mod, newdata = data.frame(non_white = 61))
+
+```
+
+**A.** Her prediction would be `r asdf`%
+
+```{r}
+asdf2 <- lm(trump_support ~ non_white, data = trump)
+asdf3 <- get_regression_points(asdf2)
+```
+
+**B.** Compared to observed data, it would be an overestimate.
+
+**C.** The residual when the non-white data was at 61 is `r asdf3[2, 5]`
+:::
+
+# Turning in Your Work
+
+You will need to make sure you commit and push all of your changes to the github education repository where you obtained the lab.
+
+::: callout-tip
+-   Make sure you **render a final copy with all your changes** and work.
+-   Look at your final html file to make sure it contains the work you expect and is formatted properly.
+:::
+
+# Logging out of the Server
+
+There are many statistics classes and students using the Server. To keep the server running as fast as possible, it is best to sign out when you are done. To do so, follow all the same steps for closing Quarto document:
+
+::: callout-tip
+-   Save all your work.
+-   Click on the orange button in the far right corner of the screen to quit `R`
+-   Choose **don't save** for the **Workspace image**
+-   When the browser refreshes, you can click on the sign out next to your name in the top right.
+-   You are signed out.
+:::
+
+```{r}
+sessionInfo()
+```

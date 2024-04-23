@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Max Mathues">
+
+<title>Problem Set 04: Linear Regression</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="PS04_source_files/libs/clipboard/clipboard.min.js"></script>
+<script src="PS04_source_files/libs/quarto-html/quarto.js"></script>
+<script src="PS04_source_files/libs/quarto-html/popper.min.js"></script>
+<script src="PS04_source_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="PS04_source_files/libs/quarto-html/anchor.min.js"></script>
+<link href="PS04_source_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="PS04_source_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="PS04_source_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="PS04_source_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="PS04_source_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="PS04_source.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Problem Set 04: Linear Regression</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Max Mathues </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">Last modified on September 13, 2023 21:07:26 Eastern Daylight Time</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="background" class="level1">
+<h1>Background</h1>
+<p>For this problem set you will first run through an example of a simple linear regression, answering a few questions on the way. Then you will work through a regression analysis independently. Knit this file…and you can read through all the instructions.</p>
+<p>We will look at some demographic data from the <code>fivethirtyeight</code> package recorded for 48 voting areas in the US states just after the 2016 presidential election. We will investigate what variables within those regions might be tied to the percentage of US voters that supported Donald Trump, and in turn, which variables might be useful to predict Trump support in other regions (i.e.&nbsp;to a wider US population).</p>
+</section>
+<section id="setup" class="level1">
+<h1>Setup</h1>
+<section id="load-packages" class="level2">
+<h2 class="anchored" data-anchor-id="load-packages">Load Packages</h2>
+<p>We will read the data in with the <code>readr</code> package, explore the data using the <code>dplyr</code> package and visualize the data using the <code>ggplot2</code> package. The <code>moderndive</code> package includes some nice functions to show regression model outputs.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(moderndive)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="the-data" class="level2">
+<h2 class="anchored" data-anchor-id="the-data">The Data</h2>
+<p>The following uses the function <code>read_csv()</code> to read a <code>*.CSV</code> file of the data from where it is published on the web.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">"https://docs.google.com/spreadsheets/d/e/2PACX-1vT8qHdvTPaRc62hU94ShBcSh04HP3c11b6XZIPMiUDGuwPtifpP7QhHdSHS2YgTRMRTgfUmBYq-L3ZT/pub?gid=1217616678&amp;single=true&amp;output=csv"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">dir.exists</span>(<span class="st">"./data/"</span>)){</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(<span class="st">"./data/"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"./data/trump.csv"</span>)){</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">download.file</span>(url, <span class="at">destfile =</span> <span class="st">"./data/trump.csv"</span>)}</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>trump <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"./data/trump.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<p>Take a moment to look at the data in the viewer or by using <code>glimpse()</code>.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(trump)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 48
+Columns: 4
+$ hs_ed         &lt;dbl&gt; 90.4, 80.6, 91.0, 89.0, 89.0, 84.7, 89.7, 86.4, 82.8, 84…
+$ poverty       &lt;dbl&gt; 7, 9, 10, 8, 6, 10, 9, 7, 10, 8, 6, 10, 8, 7, 7, 12, 5, …
+$ non_white     &lt;dbl&gt; 81, 61, 6, 27, 50, 42, 31, 37, 62, 28, 30, 26, 37, 44, 3…
+$ trump_support &lt;dbl&gt; 30, 33, 33, 34, 35, 37, 38, 39, 40, 40, 41, 41, 42, 42, …</code></pre>
+</div>
+</div>
+<p>The explanatory variables include:</p>
+<ul>
+<li><code>hs_ed</code> - the percentage of the adults in the region with a high school education.</li>
+<li><code>poverty</code>- the percentage of the “white” households in the region in poverty.</li>
+<li><code>non_white</code>- the percentage of humans in a region that identify as a person of color.</li>
+</ul>
+<p>The outcome variable <code>trump_support</code> is the percentage of votes for Trump in 2016 in each region.</p>
+<p>Observe that all percentages are expressed as values between 0 and 100, and not 0 and 1.</p>
+</section>
+</section>
+<section id="an-exampledemo" class="level1">
+<h1>An Example/Demo</h1>
+<section id="visualization" class="level2">
+<h2 class="anchored" data-anchor-id="visualization">Visualization</h2>
+<p>We will start by investigating the relationship between white poverty levels and support for Trump.</p>
+<p>We’ll do this by creating a scatterplot with <code>trump_support</code> as the outcome variable on the y-axis and <code>poverty</code> as the explanatory variable on the x-axis. Note the use of the <code>geom_smooth()</code> function, that tells <code>R</code> to add a regression line. While the points do scatter/vary around the blue regression line, of all possible lines we can draw in this point of clouds, the blue line is the “best-fitting” line in that in minimizes the sum of the squared residuals.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> trump, <span class="fu">aes</span>(<span class="at">y =</span> trump_support, <span class="at">x =</span> poverty)) <span class="sc">+</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Percentage of white households in poverty"</span>, </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Percentage of voters supporting Trump"</span>, </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Trump support and white poverty in the US"</span>) <span class="sc">+</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-TSG" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="PS04_source_files/figure-html/fig-TSG-1.png" class="img-fluid figure-img" width="384"></p>
+<figcaption class="figure-caption">Figure&nbsp;1: Percentage of voters supporting Trump versus the percentage of white households in poverty.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 1">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 1
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Does the relationship in <a href="#fig-TSG">Figure&nbsp;1</a> appear to be positive or negative? Does the relationship in <a href="#fig-TSG">Figure&nbsp;1</a> look reasonably linear?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 1 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 1 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>It is a positive relationship, although it is relatively weak. I would say that it is not reasonably linear.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="the-correlation-coefficient-r" class="level2">
+<h2 class="anchored" data-anchor-id="the-correlation-coefficient-r">The Correlation Coefficient (r)</h2>
+<p>We can numerically quantify the strength of the linear relationship between the two variables with the correlation coefficient. The following tells <code>R</code> to <code>summarize()</code> the correlation coefficient between the numerical variables <code>poverty</code> and <code>trump_support</code>. Note that the correlation coefficient only exists for pairs of numerical variables.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>trump <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">r =</span> <span class="fu">cor</span>(trump_support, poverty))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+      r
+  &lt;dbl&gt;
+1 0.486</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Or</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>trump <span class="sc">%&gt;%</span> <span class="fu">get_correlation</span>(trump_support <span class="sc">~</span> poverty) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+    cor
+  &lt;dbl&gt;
+1 0.486</code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="running-a-linear-regression-model" class="level2">
+<h2 class="anchored" data-anchor-id="running-a-linear-regression-model">Running a Linear Regression Model</h2>
+<p>In <code>R</code> we can fit a linear regression model (a regression line), like so:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>poverty_mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(trump_support <span class="sc">~</span> poverty, <span class="at">data =</span> trump)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Note that:</p>
+<ul>
+<li>the function <code>lm()</code> is short for “linear model”</li>
+<li>the first argument is a <em>formula</em> in the form <code>y ~ x</code> or in other words <code>outcome variable ~ explantory variable</code>.<br>
+</li>
+<li>the second argument is the data frame in which the outcome and explanatory variables can be found.</li>
+<li>we <strong>SAVED THE MODEL RESULTS</strong> as an object called <code>poverty_mod</code></li>
+</ul>
+<p>This object <code>poverty_mod</code> contains all of the information we need about the linear model that was just fit and we’ll be accessing this information again later.</p>
+</div>
+</div>
+</section>
+<section id="get-the-regression-table" class="level2">
+<h2 class="anchored" data-anchor-id="get-the-regression-table">Get the Regression Table</h2>
+<p>The <code>get_regression_table()</code> function from the <code>moderndive</code> package will output a regression table. Let’s focus on the value in the second column: an estimate for 1) an intercept, and 2) a slope for the <code>poverty</code> variable. We’ll revisit what the other columns mean in a future problem set.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_regression_table</span>(poverty_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 7
+  term      estimate std_error statistic p_value lower_ci upper_ci
+  &lt;chr&gt;        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 intercept    30.8      5.22       5.90       0   20.3      41.3 
+2 poverty       2.06     0.545      3.78       0    0.961     3.16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">get_regression_table</span>(poverty_mod))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 13%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 12%">
+<col style="width: 13%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std_error</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p_value</th>
+<th style="text-align: right;">lower_ci</th>
+<th style="text-align: right;">upper_ci</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">intercept</td>
+<td style="text-align: right;">30.806</td>
+<td style="text-align: right;">5.223</td>
+<td style="text-align: right;">5.898</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">20.293</td>
+<td style="text-align: right;">41.320</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">poverty</td>
+<td style="text-align: right;">2.059</td>
+<td style="text-align: right;">0.545</td>
+<td style="text-align: right;">3.776</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.961</td>
+<td style="text-align: right;">3.157</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># I prefer</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">summary</span>(poverty_mod)<span class="sc">$</span>coef)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">Std. Error</th>
+<th style="text-align: right;">t value</th>
+<th style="text-align: right;">Pr(&gt;|t|)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">30.806367</td>
+<td style="text-align: right;">5.2230395</td>
+<td style="text-align: right;">5.898168</td>
+<td style="text-align: right;">4.00e-07</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">poverty</td>
+<td style="text-align: right;">2.059089</td>
+<td style="text-align: right;">0.5453428</td>
+<td style="text-align: right;">3.775769</td>
+<td style="text-align: right;">4.56e-04</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<p>We can interpret the <code>intercept</code> and <code>poverty</code> slope like so:</p>
+<ul>
+<li>When the poverty level is 0, the predicted average Trump support is 30.81%.</li>
+<li>For every increase in poverty level of 1 percentage point, there is an <strong>associated increase</strong> in Trump support of 2.06 percentage points.</li>
+</ul>
+<p>Revisiting the <a href="#fig-TSG">Figure&nbsp;1</a>, we can see that the best-fit line hits the y axis at 30.81 (if we extend it). This is the intercept…the y value at which poverty = 0 (note, a value that is not close to the range of values for “percentage of white households in poverty”).</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-ts" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="PS04_source_files/figure-html/fig-ts-1.png" class="img-fluid figure-img" width="480"></p>
+<figcaption class="figure-caption">Figure&nbsp;2: Trump support and white poverty in the US</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 2">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 2
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We found a positive correlation coefficient between <code>trump_support</code> and <code>poverty</code>. Is it reasonable for us to conclude that social policies that increase white poverty will <strong>cause</strong> an increase in Trump support? Explain why or why not?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 2 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 2 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>I think that by looking strictly at the data, it would be reasonable to assume that increases in poverty would lead to increases in Trump support. This is backed up by the graph showing that with a higher percentage of white households in poverty, there is a higher percentage of voters supporting Trump.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="making-predictions" class="level2">
+<h2 class="anchored" data-anchor-id="making-predictions">Making Predictions</h2>
+<p>Based on the <code>R</code> output of our model, the following is our least squares regression line for the linear model:</p>
+<p><span class="math display">\[\widehat{\text{trump\_support}} = 30.8064 + 2.0591 \times \text{poverty}\]</span></p>
+<p>We can use the least squares regression line of the <code>trump_support</code> versus <code>poverty</code> relationship (See <a href="#fig-ts">Figure&nbsp;2</a>) to <strong>visually</strong> make predictions. For instance at 15% white poverty, the line shows a value of just over 60% Trump support.</p>
+<p>To get a <strong>more accurate</strong> prediction, we could actually plug 15% into the regression equation like so:</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>y_hat <span class="ot">=</span> <span class="fl">30.8064</span> <span class="sc">+</span> <span class="fl">2.0591</span> <span class="sc">*</span> <span class="dv">15</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>y_hat</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 61.6929</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Or better yet</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(poverty_mod, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">poverty =</span> <span class="dv">15</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       1 
+61.69269 </code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 3">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 3
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What percent of Trump support would you expect at a value of 6% white poverty?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 3 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 3 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>y_hat <span class="ot">=</span> <span class="fl">30.8064</span> <span class="sc">+</span> <span class="fl">2.0591</span> <span class="sc">*</span> <span class="dv">6</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>y_hat</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 43.161</code></pre>
+</div>
+</div>
+<ul>
+<li>I would expect 43.161% of voters to support Trump.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 4">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 4
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Do you think it is a good idea to predict Trump support at 85% white poverty, based on this regression equation? Explain your reasoning. Look at <a href="#fig-ts">Figure&nbsp;2</a> carefully before answering the question.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 4 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 4 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>It would not be a good idea because real life data is not linear, which means that at 85% it will not be a reasonable figure.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="residuals" class="level2">
+<h2 class="anchored" data-anchor-id="residuals">Residuals</h2>
+<p>Recall that model residuals are the difference between the <strong>observed values in your data set</strong> and the <strong>values predicted by the line</strong>:</p>
+<p><span class="math display">\[\text{residual} = y - \hat{y}\]</span></p>
+<p>For instance, below, one data point is highlighted in blue…the residual is the difference between the y value of the <strong>data point</strong> (here 69), and the y value <strong>predicted</strong> by the line (roughly 59). Here the residual is roughly 10 (<span class="math inline">\(69 - 59 = 10\)</span>). The regression equation has under-estimated Trump support, compared to this data point.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="PS04_source_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="384"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The function <code>get_regression_points()</code> provides the <strong>fitted</strong> also known as <strong>predicted</strong> value for every data point, and the <strong>residual</strong> for every data point. The first row in the output is the first data point…you see that Trump support was 30%, white poverty was 7%, the regression equation predicted 45.22% Trump support, and the residual was <span class="math inline">\(-15.22 = (30 - 45.22)\)</span>.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">get_regression_points</span>(poverty_mod)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(results))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;">ID</th>
+<th style="text-align: right;">trump_support</th>
+<th style="text-align: right;">poverty</th>
+<th style="text-align: right;">trump_support_hat</th>
+<th style="text-align: right;">residual</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">45.220</td>
+<td style="text-align: right;">-15.220</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">49.338</td>
+<td style="text-align: right;">-16.338</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">51.397</td>
+<td style="text-align: right;">-18.397</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">47.279</td>
+<td style="text-align: right;">-13.279</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">43.161</td>
+<td style="text-align: right;">-8.161</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">51.397</td>
+<td style="text-align: right;">-14.397</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="put-your-skills-to-practice-independently" class="level2">
+<h2 class="anchored" data-anchor-id="put-your-skills-to-practice-independently">Put your Skills to Practice Independently!</h2>
+<p>Use the same <code>trump</code> data set for the following questions:</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 5">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 5
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Generate a scatterplot with a best-fitting line with <code>non_white</code> as the explanatory variable, and <code>trump_support</code> as the response. Be sure to include an informative title and axis labels for your plot. This will help contextualize the plot.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 5 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 5 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> trump, <span class="fu">aes</span>(<span class="at">y =</span> trump_support, <span class="at">x =</span> non_white))<span class="sc">+</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span>  </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Percentage of non-white voters"</span>, </span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Percentage of voters supporting Trump"</span>, </span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Trump support and non-white voters in the US"</span>) <span class="sc">+</span> </span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="PS04_source_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 6">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 6
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Do you expect the correlation coefficient (for <code>non_white</code> and <code>trump_support</code>) to be positive or negative? Write a code chunk testing your prediction (it is OK if your expectation was wrong!).</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 6 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 6 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>Based on the graph I just created, I expect it to be negative.</li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>trump <span class="sc">%&gt;%</span> <span class="fu">get_correlation</span>(trump_support <span class="sc">~</span> non_white) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+     cor
+   &lt;dbl&gt;
+1 -0.425</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 7">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 7
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Run a linear regression using <code>non_white</code> as the <strong>explanatory</strong> variable, and <code>trump_support</code> as the <strong>outcome</strong> variable. Store your linear model in the object <code>nw_mod</code>. Use the <code>get_regression_table()</code> function on <code>nw_mod</code> and interpret the intercept and slope estimates.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 7 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 7 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>nw_mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(trump_support <span class="sc">~</span> non_white, <span class="at">data =</span> trump)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">get_regression_table</span>(nw_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 7
+  term      estimate std_error statistic p_value lower_ci upper_ci
+  &lt;chr&gt;        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 intercept   58.3       2.98      19.6    0       52.3     64.3  
+2 non_white   -0.269     0.084     -3.18   0.003   -0.439   -0.099</code></pre>
+</div>
+</div>
+<ul>
+<li><p>When the non-white level is 0, the predicted average Trump support is 58.328%.</p></li>
+<li><p>For every increase in non-white of 1 percentage point, there is an associated decrease in Trump support of .269 percentage points.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 8">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 8
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Make a numerical prediction for the level of trump support for a region that has 70% of humans that identify as a person of color. In other words, use <strong>math</strong> not a visual prediction.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 8 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 8 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>trump_support_hat <span class="ot">&lt;-</span> <span class="fl">58.328</span> <span class="sc">-</span> .<span class="dv">269</span> <span class="sc">*</span> <span class="dv">70</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>trump_support_hat</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 39.498</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Just to double check</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(nw_mod, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">non_white =</span> <span class="dv">70</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       1 
+39.48989 </code></pre>
+</div>
+</div>
+<ul>
+<li>There would be roughly 39.498% of voters in support of Trump.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 9">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 9
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Based on the evidence you have so far (scatterplots and correlation coefficients), which of the explanatory variables we have considered (<code>non_white</code> or <code>poverty</code>) seems to be a better explanatory variable of Trump support? Explain.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 9 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 9 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>trump <span class="sc">%&gt;%</span> <span class="fu">get_correlation</span>(trump_support <span class="sc">~</span> poverty) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+    cor
+  &lt;dbl&gt;
+1 0.486</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>trump <span class="sc">%&gt;%</span> <span class="fu">get_correlation</span>(trump_support <span class="sc">~</span> non_white) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+     cor
+   &lt;dbl&gt;
+1 -0.425</code></pre>
+</div>
+</div>
+<ul>
+<li>I consider non_white to be the better explanatory variable, because the correlation coefficient is closer to 0, and it works better with larger percentage predictions.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 10">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 10
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If Representative Ocasio-Cortez saw the regression line (<code>nw_mod</code>) and not the actual data:</p>
+<p><strong>A.</strong> What would her prediction of Trump support be for a region in which 61% of the people identify as non-white?</p>
+<p><strong>B.</strong> Would her prediction be an overestimate or an underestimate (compared to the observed data), and by how much?</p>
+<p><strong>C.</strong> In other words, what is the residual for this prediction?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 10 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 10 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>asdf <span class="ot">&lt;-</span> <span class="fu">predict</span>(nw_mod, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">non_white =</span> <span class="dv">61</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>A.</strong> Her prediction would be 41.9119653%</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>asdf2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(trump_support <span class="sc">~</span> non_white, <span class="at">data =</span> trump)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>asdf3 <span class="ot">&lt;-</span> <span class="fu">get_regression_points</span>(asdf2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>B.</strong> Compared to observed data, it would be an overestimate.</p>
+<p><strong>C.</strong> The residual when the non-white data was at 61 is -8.912</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="turning-in-your-work" class="level1">
+<h1>Turning in Your Work</h1>
+<p>You will need to make sure you commit and push all of your changes to the github education repository where you obtained the lab.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Make sure you <strong>render a final copy with all your changes</strong> and work.</li>
+<li>Look at your final html file to make sure it contains the work you expect and is formatted properly.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="logging-out-of-the-server" class="level1">
+<h1>Logging out of the Server</h1>
+<p>There are many statistics classes and students using the Server. To keep the server running as fast as possible, it is best to sign out when you are done. To do so, follow all the same steps for closing Quarto document:</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Save all your work.</li>
+<li>Click on the orange button in the far right corner of the screen to quit <code>R</code></li>
+<li>Choose <strong>don’t save</strong> for the <strong>Workspace image</strong></li>
+<li>When the browser refreshes, you can click on the sign out next to your name in the top right.</li>
+<li>You are signed out.</li>
+</ul>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.2.3 (2023-03-15)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Red Hat Enterprise Linux 9.2 (Plow)
+
+Matrix products: default
+BLAS/LAPACK: /usr/lib64/libopenblasp-r0.3.21.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] moderndive_0.5.5 readr_2.1.4      ggplot2_3.4.3    dplyr_1.1.3     
+[5] knitr_1.43      
+
+loaded via a namespace (and not attached):
+ [1] tidyselect_1.2.0     xfun_0.40            janitor_2.2.0       
+ [4] purrr_1.0.2          lattice_0.21-8       operator.tools_1.6.3
+ [7] splines_4.2.2        snakecase_0.11.1     colorspace_2.1-0    
+[10] vctrs_0.6.3          generics_0.1.3       htmltools_0.5.6     
+[13] yaml_2.3.7           mgcv_1.9-0           utf8_1.2.3          
+[16] rlang_1.1.1          pillar_1.9.0         glue_1.6.2          
+[19] withr_2.5.0          infer_1.0.5          bit64_4.0.5         
+[22] lifecycle_1.0.3      stringr_1.5.0        munsell_0.5.0       
+[25] gtable_0.3.4         htmlwidgets_1.6.2    evaluate_0.21       
+[28] labeling_0.4.3       tzdb_0.4.0           fastmap_1.1.1       
+[31] parallel_4.2.2       fansi_1.0.4          broom_1.0.5         
+[34] scales_1.2.1         backports_1.4.1      vroom_1.6.3         
+[37] jsonlite_1.8.7       farver_2.1.1         bit_4.0.5           
+[40] hms_1.1.3            digest_0.6.33        stringi_1.7.12      
+[43] formula.tools_1.7.1  grid_4.2.2           cli_3.6.1           
+[46] tools_4.2.2          magrittr_2.0.3       tibble_3.2.1        
+[49] crayon_1.5.2         tidyr_1.3.0          pkgconfig_2.0.3     
+[52] ellipsis_0.3.2       Matrix_1.6-1         lubridate_1.9.2     
+[55] timechange_0.2.0     rmarkdown_2.24       rstudioapi_0.15.0   
+[58] R6_2.5.1             nlme_3.1-163         compiler_4.2.2      </code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

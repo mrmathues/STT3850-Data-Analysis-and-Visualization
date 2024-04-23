@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Max Mathues">
+
+<title>Problem Set 09</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="PS09_source_files/libs/clipboard/clipboard.min.js"></script>
+<script src="PS09_source_files/libs/quarto-html/quarto.js"></script>
+<script src="PS09_source_files/libs/quarto-html/popper.min.js"></script>
+<script src="PS09_source_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="PS09_source_files/libs/quarto-html/anchor.min.js"></script>
+<link href="PS09_source_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="PS09_source_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="PS09_source_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="PS09_source_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="PS09_source_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="PS09_source.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Problem Set 09</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Max Mathues </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">Last modified on November 21, 2023 10:59:46 Eastern Standard Time</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="background" class="level1">
+<h1>Background</h1>
+<p>First load the necessary packages:</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(infer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<p>For this Problem Set, you will work with some grade-point-average (GPA) data for college freshman. The following will read in the data:</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">dir.exists</span>(<span class="st">"./Data"</span>)){</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(<span class="st">"./Data"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">"https://rudeboybert.github.io/SDS220/static/PS/sat_gpa.csv"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"./Data/sat_gpa.csv"</span>)){ </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download.file</span>(url, <span class="at">destfile =</span> <span class="st">"./Data/sat_gpa.csv"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>sat_gpa <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"./Data/sat_gpa.csv"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(sat_gpa)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1000    7</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show first 6 rows of sat_gpa</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(sat_gpa))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;">…1</th>
+<th style="text-align: left;">sex</th>
+<th style="text-align: right;">sat_verbal</th>
+<th style="text-align: right;">sat_math</th>
+<th style="text-align: right;">sat_total</th>
+<th style="text-align: left;">gpa_hs</th>
+<th style="text-align: right;">gpa_fy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: right;">65</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">127</td>
+<td style="text-align: left;">high</td>
+<td style="text-align: right;">3.18</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">122</td>
+<td style="text-align: left;">high</td>
+<td style="text-align: right;">3.33</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">116</td>
+<td style="text-align: left;">high</td>
+<td style="text-align: right;">3.25</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">95</td>
+<td style="text-align: left;">high</td>
+<td style="text-align: right;">2.42</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">107</td>
+<td style="text-align: left;">high</td>
+<td style="text-align: right;">2.63</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">111</td>
+<td style="text-align: left;">high</td>
+<td style="text-align: right;">2.91</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<p>Be sure to take a look at the data in <code>sat_gpa</code>. Each row or case in this data frame is a student. The data includes the binary gender (<code>sex</code>) of each student; the math (<code>sat_math</code>), verbal (<code>sat_verbal</code>) and total SAT scores (<code>sat_total</code>) for each student; the GPA of each student in high school (<code>gpa_hs</code>) categorized as “low” or “high”; and the GPA of each student their first year of college on a numeric scale (<code>gpa_fy</code>).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We will use hypothesis testing to answer the following questions:</p>
+<ul>
+<li>Is there a difference in male and female freshman GPAs?</li>
+<li>Is there a difference in total SAT score for students with a “low” and “high” high-school GPA?</li>
+</ul>
+<p>Note, if you get stuck as you are working through this, it will be helpful to go back and read <a href="https://moderndive.com/9-hypothesis-testing.html">Chapter 9</a> in <a href="https://moderndive.com/index.html">ModernDive</a>.</p>
+</div>
+</div>
+</section>
+<section id="gender-differences-in-first-year-gpa" class="level1">
+<h1>Gender Differences in First-Year GPA?</h1>
+<section id="exploratory-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis</h2>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 1">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 1
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Calculate the mean GPA score for each sex, using the <code>group_by</code> and <code>summarize</code> commands from the <code>dplyr</code> package. Store the result in <code>avg_gpa_sex</code>. What is the difference in sample mean GPA’s? Make a guess: is this difference statistically significant?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 1 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 1 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>avg_sat_gpa <span class="ot">&lt;-</span> sat_gpa <span class="sc">%&gt;%</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">mean</span>(gpa_fy))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>avg_sat_gpa</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  sex    `mean(gpa_fy)`
+  &lt;chr&gt;           &lt;dbl&gt;
+1 Female           2.54
+2 Male             2.40</code></pre>
+</div>
+</div>
+<ul>
+<li><p>The difference in GPA is 0.1485209.</p></li>
+<li><p>This doesn’t appear to be a statistically significant difference.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 2">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 2
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Generate a data visualization that displays the GPAs of the two groups. Be sure to include a title and label your axes.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 2 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 2 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sat_gpa, <span class="fu">aes</span>(<span class="at">x =</span> sex, <span class="at">y =</span> gpa_fy))<span class="sc">+</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'First-year GPAs by Gender'</span>, <span class="at">x =</span> <span class="st">'Gender'</span>, <span class="at">y =</span> <span class="st">'First-Year GPA'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="PS09_source_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="stating-a-null-hypothesis" class="level2">
+<h2 class="anchored" data-anchor-id="stating-a-null-hypothesis">Stating a Null Hypothesis</h2>
+<p>We will now test the null hypothesis that there’s no difference in population mean GPA between the sexes at the population level. We can write this out in mathematical notation</p>
+<p><span class="math display">\[\begin{aligned} H_0:&amp;\mu_{\text{female}} = \mu_{\text{male}} \\\ \mbox{vs }H_A:&amp; \mu_{\text{female}} \neq \mu_{\text{male}} \end{aligned}\]</span></p>
+<p>or expressed differently, that the difference is 0 or not:</p>
+<p><span class="math display">\[\begin{aligned} H_0:&amp;\mu_{\text{female}} - \mu_{\text{male}} = 0 \\\ \mbox{vs }H_A:&amp; \mu_{\text{female}} - \mu_{\text{male}} \neq 0 \end{aligned}\]</span></p>
+</section>
+<section id="testing-the-hypothesis" class="level2">
+<h2 class="anchored" data-anchor-id="testing-the-hypothesis">Testing the Hypothesis</h2>
+<p>Here’s how we use infer to run this hypothesis test:</p>
+<section id="step-1-calculate-the-observed-difference" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="step-1-calculate-the-observed-difference">Step 1: Calculate the Observed Difference</h3>
+<p>Note that the order we choose does not matter here (female then male)…but since we used <code>order = c("Female", "Male")</code> here, we should do the same in subsequent calculations!</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>obs_diff_gpa_sex <span class="ot">&lt;-</span> sat_gpa <span class="sc">%&gt;%</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(gpa_fy <span class="sc">~</span> sex) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"diff in means"</span>, </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="st">"Female"</span>, <span class="st">"Male"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>()</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>obs_diff_gpa_sex</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1485209</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># OR</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>obs_diff <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">diff</span>(<span class="fu">tapply</span>(sat_gpa<span class="sc">$</span>gpa_fy, sat_gpa<span class="sc">$</span>sex, mean))</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>obs_diff</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Male 
+0.1485209 </code></pre>
+</div>
+</div>
+</div>
+</div>
+<p>Note that this is the difference in the group means we calculated earlier!</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>obs_diff_gpa_sex</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1485209</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fl">2.544587</span> <span class="sc">-</span> <span class="fl">2.396066</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.148521</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>avf_avm <span class="ot">&lt;-</span> obs_diff_gpa_sex</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>avf_avm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1485209</code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="step-2.-generate-the-null-distribution-of-delta" class="level3">
+<h3 class="anchored" data-anchor-id="step-2.-generate-the-null-distribution-of-delta">Step 2. Generate the Null Distribution of <span class="math inline">\(\delta\)</span></h3>
+<p>This step involves generating simulated values <em>as if</em> we lived in a world where there’s no difference between the two groups. Going back to the idea of permutation, and tactile sampling, this is akin to shuffling the GPA scores between male and female labels (i.e.&nbsp;removing the structure to the data) just as we could have done with index cards.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>gpas_in_null_world <span class="ot">&lt;-</span> sat_gpa <span class="sc">%&gt;%</span> </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(gpa_fy <span class="sc">~</span> sex) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">2000</span>, <span class="at">type =</span> <span class="st">"permute"</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(gpas_in_null_world))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;">gpa_fy</th>
+<th style="text-align: left;">sex</th>
+<th style="text-align: right;">replicate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1.50</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3.18</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2.38</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1.96</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3.07</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2.98</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 3">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 3
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What was the size of the “shuffled” (permuted) sample in each replicate?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 3 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 3 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>The size of the shuffled sample was 1000.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 4">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 4
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>How many times did we do a different “shuffle” (permute) here to the sample? How many rows are in the <code>gpas_in_null_world</code> data frame?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 4 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 4 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(gpas_in_null_world)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2000000</code></pre>
+</div>
+</div>
+<ul>
+<li><p>we did a different shuffle 2000 times.</p></li>
+<li><p>There are 2000000 rows in gpas_in_null_world.</p></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="step-3.-calculate-the-differences-between-male-and-females-under-the-null-hypothesis" class="level3">
+<h3 class="anchored" data-anchor-id="step-3.-calculate-the-differences-between-male-and-females-under-the-null-hypothesis">Step 3. Calculate the Differences Between Male and Females Under the Null Hypothesis</h3>
+<p>The following calculates the differences in mean GPA for males and females for “shuffled” (permuted) data.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>gpa_diff_under_null <span class="ot">&lt;-</span> gpas_in_null_world <span class="sc">%&gt;%</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"diff in means"</span>, <span class="at">order =</span> <span class="fu">c</span>(<span class="st">"Female"</span>, <span class="st">"Male"</span>)) </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>gpa_diff_under_null <span class="sc">%&gt;%</span> </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>) <span class="sc">%&gt;%</span>  <span class="co"># show first five rows</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;">replicate</th>
+<th style="text-align: right;">stat</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">-0.0225343</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.0044534</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.0204698</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">-0.0005518</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">-0.0045158</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Done with a for loop</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>B <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>mean_diff <span class="ot">&lt;-</span> <span class="fu">numeric</span>(B)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>B){</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  mean_diff[i] <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">diff</span>(<span class="fu">tapply</span>(sat_gpa<span class="sc">$</span>gpa_fy, <span class="fu">sample</span>(sat_gpa<span class="sc">$</span>sex), mean))</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(mean_diff)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> obs_diff, <span class="at">lty =</span> <span class="st">"dashed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="PS09_source_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 5">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 5
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>How many rows are in the <code>gpa_diff_under_null</code> data frame? Why?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 5 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 5 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>There are 2000 rows in gpa_diff_under_null because there is a for loop that loops and adds to mean_diff 2000 times.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="step-4.-visualize-how-the-observed-difference-compares-to-the-null-distribution-of-delta" class="level3">
+<h3 class="anchored" data-anchor-id="step-4.-visualize-how-the-observed-difference-compares-to-the-null-distribution-of-delta">Step 4. Visualize how the Observed Difference Compares to the Null Distribution of <span class="math inline">\(\delta\)</span></h3>
+<p>The following plots the <span class="math inline">\(\delta\)</span> values we calculated for each of the different “shuffled” replicates. This is the null distribution of <span class="math inline">\(\delta\)</span>. The red line shows the observed difference between male and female scores in the data (0.1485209) from Step 1.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>gpa_diff_under_null <span class="sc">%&gt;%</span> </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visualize</span>() <span class="sc">+</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Difference in mean GPA for males and females"</span>, <span class="at">y =</span> <span class="st">"Count"</span>,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Null distribution of differences in male and female GPAs"</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtitle =</span> <span class="st">"Actual difference observed in the data is marked in red"</span>) <span class="sc">+</span> </span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(<span class="at">obs_stat =</span> obs_diff_gpa_sex, <span class="at">direction =</span> <span class="st">"two-sided"</span>) <span class="sc">+</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="PS09_source_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Note that zero is the center of this null distribution.</strong> The null hypothesis is that there is no difference between males and females in GPA score. In the permutations, zero was the most common value, because all structure was removed from the data. GPA values were sorted into male and female <strong>at random</strong>. Values as large as 0.1 and -0.1 occurred, but much less frequently, because they are just not as likely when structure is removed from the data.</p>
+</div>
+</div>
+</section>
+<section id="step-5-calculate-a-p-value" class="level3">
+<h3 class="anchored" data-anchor-id="step-5-calculate-a-p-value">Step 5: Calculate a p-value</h3>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>gpa_diff_under_null <span class="sc">%&gt;%</span> </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_pvalue</span>(<span class="at">obs_stat =</span> obs_diff_gpa_sex, <span class="at">direction =</span> <span class="st">"both"</span>) <span class="sc">%&gt;%</span>   </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>() <span class="ot">-&gt;</span> pvalue</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>pvalue</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.001</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># OR from the for loop - slighlty more conservative approach</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>p_value <span class="ot">&lt;-</span> (<span class="fu">sum</span>(mean_diff <span class="sc">&gt;=</span> obs_diff)<span class="sc">*</span><span class="dv">2</span> <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">/</span>(B <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>p_value</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.002498751</code></pre>
+</div>
+</div>
+</div>
+</div>
+<p>The p-value indicates that there is a 0.001 or 0.0025 chance (very low even with the conservative p-value computation) that we would see a difference of 0.1485209 in GPA scores between males and females (or a bigger difference) if in fact there was truly no difference between the sexes in GPA scores at the population level.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 6">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 6
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Fill in the blanks and select the appropriate words below to write up the results &amp; conclusions for this test:</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 6 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 6 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<p>The mean GPA scores for females in our sample (<span class="math inline">\(\bar{x}_{f}\)</span> = 2.5445868) was greater than that of males (<span class="math inline">\(\bar{x}_{m}\)</span> = 2.3960659). This difference <strong>was</strong> statistically significant at <span class="math inline">\(\alpha = 0.05\)</span>, (p = 0.001). Given this p-value, I <strong>would</strong> reject the Null hypothesis and <strong>find evidence</strong> that <strong>females</strong> have higher GPAs than <strong>males</strong> at the population level.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-6-calculate-a-confidence-interval-for-the-difference" class="level3">
+<h3 class="anchored" data-anchor-id="step-6-calculate-a-confidence-interval-for-the-difference">Step 6: Calculate a Confidence Interval for the Difference</h3>
+<p>The following will allow us to calculate a 95% bootstrap percentile confidence interval for the difference between mean GPA scores for females and males.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>ci_diff_gpa_means <span class="ot">&lt;-</span> sat_gpa <span class="sc">%&gt;%</span> </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(gpa_fy <span class="sc">~</span> sex) <span class="sc">%&gt;%</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">2000</span>, <span class="at">type =</span> <span class="st">"bootstrap"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"diff in means"</span>, <span class="at">order =</span> <span class="fu">c</span>(<span class="st">"Female"</span>, <span class="st">"Male"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_ci</span>(<span class="at">level =</span> <span class="fl">0.95</span>, <span class="at">type =</span> <span class="st">"percentile"</span>)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(ci_diff_gpa_means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;">lower_ci</th>
+<th style="text-align: right;">upper_ci</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.0544304</td>
+<td style="text-align: right;">0.2400219</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Do the same thing with a for loop</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>sat_gpa <span class="sc">%&gt;%</span> </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sex <span class="sc">==</span> <span class="st">"Female"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(gpa_fy) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>() <span class="ot">-&gt;</span> fem_gpa</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>sat_gpa <span class="sc">%&gt;%</span> </span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sex <span class="sc">==</span> <span class="st">"Male"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(gpa_fy) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>() <span class="ot">-&gt;</span> mal_gpa</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>mean_ds <span class="ot">&lt;-</span> <span class="fu">numeric</span>(B)</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>B){</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  bss1 <span class="ot">&lt;-</span> <span class="fu">sample</span>(fem_gpa, <span class="at">size =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(fem_gpa)), <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  bss2 <span class="ot">&lt;-</span> <span class="fu">sample</span>(mal_gpa, <span class="at">size =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(mal_gpa)), <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  mean_ds[i] <span class="ot">&lt;-</span> <span class="fu">mean</span>(bss1) <span class="sc">-</span> <span class="fu">mean</span>(bss2)</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">quantile</span>(mean_ds, <span class="at">probs =</span><span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">x</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2.5%</td>
+<td style="text-align: right;">0.0548812</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">97.5%</td>
+<td style="text-align: right;">0.2355701</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="complete-all-the-above-tasks-with-a-t-test" class="level2">
+<h2 class="anchored" data-anchor-id="complete-all-the-above-tasks-with-a-t-test">Complete all the Above Tasks with a t-test</h2>
+<p>Note that all the above steps can be done with one line of code <strong>if a slew of assumptions</strong> like normality and equal variance of the groups are met.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(gpa_fy <span class="sc">~</span> sex, <span class="at">var.equal =</span> <span class="cn">TRUE</span>, <span class="at">data =</span> sat_gpa)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Two Sample t-test
+
+data:  gpa_fy by sex
+t = 3.1828, df = 998, p-value = 0.001504
+alternative hypothesis: true difference in means between group Female and group Male is not equal to 0
+95 percent confidence interval:
+ 0.05695029 0.24009148
+sample estimates:
+mean in group Female   mean in group Male 
+            2.544587             2.396066 </code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="relationship-between-high-school-first-year-gpa" class="level1">
+<h1>Relationship Between High-School &amp; First-Year GPA?</h1>
+<p>For this analysis <code>sat_total</code> is the outcome variable, and <code>gpa_hs</code> is the predictor variable, with two levels “low” and “high”.</p>
+<section id="exploratory-data-analysis-1" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis-1">Exploratory Data Analysis</h2>
+<p>We can first calculate the mean total SAT score for each group (i.e students with a low and high GPA), using the <code>group_by</code> and <code>summarize</code> commands from the <code>dplyr</code> package.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>avg_sat_gpa <span class="ot">&lt;-</span> sat_gpa <span class="sc">%&gt;%</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(gpa_hs) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">sat_total =</span> <span class="fu">mean</span>(sat_total), <span class="at">n =</span> <span class="fu">n</span>())</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(avg_sat_gpa)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">gpa_hs</th>
+<th style="text-align: right;">sat_total</th>
+<th style="text-align: right;">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">high</td>
+<td style="text-align: right;">108.67828</td>
+<td style="text-align: right;">488</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">low</td>
+<td style="text-align: right;">98.23047</td>
+<td style="text-align: right;">512</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<p>We will next generate a data visualization that displays the total SAT scores of the two groups. Be sure to include a title and label your axes.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(sat_gpa, <span class="fu">aes</span>(<span class="at">x =</span> gpa_hs, <span class="at">y =</span> sat_total)) <span class="sc">+</span> </span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">"darkgreen"</span>) <span class="sc">+</span> </span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"SAT scores based on high school </span><span class="sc">\n</span><span class="st"> GPA scores"</span>, </span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"GPA ranking"</span>, </span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"SAT score"</span>) <span class="sc">+</span> </span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Or</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> sat_gpa, </span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>             <span class="fu">aes</span>(<span class="at">x =</span> sat_total, <span class="at">color =</span> gpa_hs)) <span class="sc">+</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>() <span class="sc">+</span> </span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">color =</span> <span class="st">"High School GPA"</span>,</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Densities of SAT scores based </span><span class="sc">\n</span><span class="st"> on high school GPA scores"</span>,</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"SAT score"</span>)</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">+</span> p2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="PS09_source_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="stating-a-null-hypothesis-1" class="level2">
+<h2 class="anchored" data-anchor-id="stating-a-null-hypothesis-1">Stating a Null Hypothesis</h2>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 7">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 7
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>State the null hypothesis that you are testing (using words and symbols).</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 7 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 7 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>The GPA difference doesn’t affect the SAT score.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="testing-the-null-hypothesis" class="level2">
+<h2 class="anchored" data-anchor-id="testing-the-null-hypothesis">Testing the Null Hypothesis</h2>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 8">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 8
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Calculate the observed difference between the mean total SAT scores of the low and high GPA high-school students. Store the result in an object named <code>obs_diff_sat_hs_gpa</code></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 8 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 8 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>obs_diff_sat_hs_gpa <span class="ot">&lt;-</span> sat_gpa <span class="sc">%&gt;%</span> </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(sat_total <span class="sc">~</span> gpa_hs) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"diff in means"</span>, <span class="at">order =</span> <span class="fu">c</span>(<span class="st">"high"</span>, <span class="st">"low"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 9">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 9
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Generate the null distribution of <span class="math inline">\(\delta\)</span>. Here you need to generate simulated values <em>as if</em> we lived in a world where there’s no difference in SAT scores between high school students with low and high GPAs. Use 2000 replications to generate the null distribution.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 9 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 9 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>null_sat <span class="ot">&lt;-</span> sat_gpa <span class="sc">%&gt;%</span> </span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(sat_total <span class="sc">~</span> gpa_hs) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">2000</span>, <span class="at">type =</span> <span class="st">"permute"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 10">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 10
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Calculate the differences in mean SAT scores between students with high and low GPA scores under the null hypothesis. Note you should use whatever order you chose in 7. Store your results in an object named <code>sat_diff_under_null</code>. Show the first six rows of <code>sat_diff_under_null</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 10 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-34-contents" aria-controls="callout-34" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 10 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-34" class="callout-34-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>sat_diff_under_null <span class="ot">&lt;-</span> null_sat <span class="sc">%&gt;%</span> </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"diff in means"</span>, <span class="at">order =</span> <span class="fu">c</span>(<span class="st">"high"</span>, <span class="st">"low"</span>)) </span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>sat_diff_under_null <span class="sc">%&gt;%</span> </span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Response: sat_total (numeric)
+Explanatory: gpa_hs (factor)
+Null Hypothesis: independence
+# A tibble: 6 × 2
+  replicate   stat
+      &lt;int&gt;  &lt;dbl&gt;
+1         1  0.730
+2         2  0.518
+3         3 -0.414
+4         4  0.506
+5         5  0.730
+6         6  0.798</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 11">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 11
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Visualize how the observed difference compares to the null distribution of <span class="math inline">\(\delta\)</span>. Generate a histogram of the null distribution, with a vertical red line showing the observed difference in SAT scores between high school students with a high and low GPA.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 11 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-36-contents" aria-controls="callout-36" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 11 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-36" class="callout-36-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>sat_diff_under_null <span class="sc">%&gt;%</span> </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visualize</span>(<span class="at">obs_stat =</span> obs_diff_sat_hs_gpa) <span class="sc">+</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Difference in SAT score"</span>, <span class="at">y =</span> <span class="st">"Count"</span>,</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Null distribution of differences in SAT scores"</span>) <span class="sc">+</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">shade_p_value</span>(<span class="at">obs_stat =</span> obs_diff_sat_hs_gpa, <span class="at">direction =</span> <span class="st">"two-sided"</span>) <span class="sc">+</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="PS09_source_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 12">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 12
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Calculate the p-value.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 12 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-38-contents" aria-controls="callout-38" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 12 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-38" class="callout-38-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>sat_diff_under_null <span class="sc">%&gt;%</span> </span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_pvalue</span>(<span class="at">obs_stat =</span> obs_diff_sat_hs_gpa, <span class="at">direction =</span> <span class="st">"both"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+  p_value
+    &lt;dbl&gt;
+1       0</code></pre>
+</div>
+</div>
+<ul>
+<li>Delete this and put your text answer here.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 13">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 13
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Write up the results &amp; conclusions for this hypothesis test. Note, p-values less than 0.001 are often reported as p &lt; 0.001.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 13 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-40-contents" aria-controls="callout-40" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 13 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-40" class="callout-40-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>The mean SAT scores for students with high GPA rankings was greater than those with low GPA rankings. This difference was statistically significant at α=0.05 , (p &lt; 0.001). In conclusion, I would reject the Null hypothesis and say that those with higher GPA rankings will have higher SAT scores than those with lower GPA rankings.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 14">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 14
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Compute a 95% bootstrap percentile confidence interval for the difference in total SAT scores for students with high and low high-school GPA scores. Note that you should use whatever order you chose for your null hypothesis. That is either <code>order = c("low", "high")</code> or <code>order = c("high", "low")</code>. Provide a basic interpretation of your computed interval.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 14 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-42-contents" aria-controls="callout-42" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 14 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-42" class="callout-42-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>ci_diff_sat_means <span class="ot">&lt;-</span> sat_gpa <span class="sc">%&gt;%</span> </span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(sat_total <span class="sc">~</span> gpa_hs) <span class="sc">%&gt;%</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">2000</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"diff in means"</span>, <span class="at">order =</span> <span class="fu">c</span>(<span class="st">"high"</span>, <span class="st">"low"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_ci</span>(<span class="at">level =</span> <span class="fl">0.95</span>)</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>ci_diff_gpa_means</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  lower_ci upper_ci
+     &lt;dbl&gt;    &lt;dbl&gt;
+1   0.0544    0.240</code></pre>
+</div>
+</div>
+<ul>
+<li>My lower confidence interval is .0544, and my upper confidence interval is .2400. There is between a 95% probability that the average difference between GPA of high and low SAT scorers is between these two values.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 15">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 15
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use a t-test to test the null hypothesis that average total SAT scores do not differ between students with high and low high school GPA scores at the population level.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 15 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-44-contents" aria-controls="callout-44" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 15 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-44" class="callout-44-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the bootstrap T distribution to test</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(sat_total <span class="sc">~</span> gpa_hs, <span class="at">var.equal =</span> <span class="cn">TRUE</span>, <span class="at">data =</span> sat_gpa)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Two Sample t-test
+
+data:  sat_total by gpa_hs
+t = 12.413, df = 998, p-value &lt; 2.2e-16
+alternative hypothesis: true difference in means between group high and group low is not equal to 0
+95 percent confidence interval:
+  8.79614 12.09948
+sample estimates:
+mean in group high  mean in group low 
+         108.67828           98.23047 </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="turning-in-your-work" class="level1">
+<h1>Turning in Your Work</h1>
+<p>You will need to make sure you commit and push all of your changes to the github education repository where you obtained the lab.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Make sure you <strong>render a final copy with all your changes</strong> and work.</li>
+<li>Look at your final html file to make sure it contains the work you expect and is formatted properly.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="logging-out-of-the-server" class="level1">
+<h1>Logging out of the Server</h1>
+<p>There are many statistics classes and students using the Server. To keep the server running as fast as possible, it is best to sign out when you are done. To do so, follow all the same steps for closing Quarto document:</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Save all your work.</li>
+<li>Click on the orange button in the far right corner of the screen to quit <code>R</code></li>
+<li>Choose <strong>don’t save</strong> for the <strong>Workspace image</strong></li>
+<li>When the browser refreshes, you can click on the sign out next to your name in the top right.</li>
+<li>You are signed out.</li>
+</ul>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.2.3 (2023-03-15)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Red Hat Enterprise Linux 9.2 (Plow)
+
+Matrix products: default
+BLAS/LAPACK: /usr/lib64/libopenblasp-r0.3.21.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] parallel  stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] patchwork_1.1.3  infer_1.0.5      lubridate_1.9.3  forcats_1.0.0   
+ [5] stringr_1.5.1    dplyr_1.1.4      purrr_1.0.2      readr_2.1.4     
+ [9] tidyr_1.3.0      tibble_3.2.1     ggplot2_3.4.4    tidyverse_2.0.0 
+[13] scales_1.2.1     doMC_1.3.8       iterators_1.0.14 foreach_1.5.2   
+[17] knitr_1.45      
+
+loaded via a namespace (and not attached):
+ [1] compiler_4.2.2    pillar_1.9.0      tools_4.2.2       bit_4.0.5        
+ [5] digest_0.6.33     timechange_0.2.0  jsonlite_1.8.7    evaluate_0.23    
+ [9] lifecycle_1.0.4   gtable_0.3.4      pkgconfig_2.0.3   rlang_1.1.2      
+[13] cli_3.6.1         rstudioapi_0.15.0 yaml_2.3.7        xfun_0.41        
+[17] fastmap_1.1.1     withr_2.5.2       hms_1.1.3         generics_0.1.3   
+[21] htmlwidgets_1.6.2 vctrs_0.6.4       bit64_4.0.5       grid_4.2.2       
+[25] tidyselect_1.2.0  glue_1.6.2        R6_2.5.1          fansi_1.0.5      
+[29] vroom_1.6.4       rmarkdown_2.25    farver_2.1.1      tzdb_0.4.0       
+[33] magrittr_2.0.3    codetools_0.2-19  htmltools_0.5.7   colorspace_2.1-0 
+[37] labeling_0.4.3    utf8_1.2.4        stringi_1.8.1     munsell_0.5.0    
+[41] crayon_1.5.2     </code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

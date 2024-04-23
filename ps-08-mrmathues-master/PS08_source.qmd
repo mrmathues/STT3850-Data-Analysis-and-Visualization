@@ -1,0 +1,656 @@
+---
+title: "Problem Set 08"
+author: "Max Mathues"
+date: last-modified
+date-format: "[Last modified on] MMMM DD, YYYY HH:mm:ss zzz"
+format: 
+  html: default
+  pdf: default
+editor: visual
+---
+
+```{r include = FALSE}
+# Do not edit this code block/chunk!
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center", comment = NA, message = FALSE,  warning = FALSE, fig.width = 16/2, fig.height = 9/2)
+library(scales)
+```
+
+```{r, echo = FALSE}
+knitr::include_graphics("https://i.pinimg.com/originals/8b/a5/6d/8ba56d685c24a243836ace7332f553f7.jpg", dpi = 126)
+```
+
+# Background
+
+In this problem set we will use a small **sample** of data from the [General Social Survey](http://gss.norc.org/). The survey is designed to monitor changes in both social characteristics and attitudes. You will work with a **sample** from one neighborhood. The full neighborhood of **ALL individuals** is the population. For this problem set we do **not** know the **true population parameters** for any of the variables, because we do not have data on every person in the neighborhood.
+
+## Setup
+
+First load the necessary packages:
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+# Recall that loading the tidyverse "umbrella" package loads ggplot2, 
+# dplyr, and readr all at once. Feel free to load these packages any 
+# way you choose.
+library(tidyverse)
+library(moderndive)
+```
+:::
+
+Next, load the data set from where it is stored on the web:
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+#| label: "gssData"
+if(!dir.exists("./Data")){dir.create("./Data")}
+url <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vSypSoDCMH2N76Vo2dZRPkw2q3t1mbvAXlOtgPDIsHg4NclAQFmER-BdvXH9_lrT40UQCVdPXOi_NMJ/pub?gid=257689625&single=true&output=csv"
+if(!file.exists("./Data/gss_sample.csv")){ download.file(url, destfile = "./Data/gss_sample.csv")}
+gss_sample <- read_csv("./Data/gss_sample.csv")
+kable(head(gss_sample), caption = "GSS sample data")
+```
+:::
+
+Be sure to examine the ***GSS sample data***. The first six rows of the data are displayed above. Each row in the data set is a person that was surveyed (100 rows or cases in total). The variables in the data set include each respondent's `age`, `race`, and number of hours of TV watched a day `tvhours`.
+
+**Setting a seed:** We will take some random samples and build sampling distributions in this lab. In order to make sure **`R`** takes the same random sample every time you run your code, you can do what is called "setting a seed". Do this in any code chunk that you take a random sample!
+
+You can set a seed like so. Any number will do. (You do not need to run this right now...just showing you how)
+
+```{r}
+set.seed(45)
+```
+
+# Confidence Intervals from a Bootstrap Resample
+
+## Step 1: Take 1000 Bootstrap Resamples {.unnumbered}
+
+The following code tells `R` to take 1000 bootstrap resamples from the `gss_sample` data. You can set the seed to whatever value you like; but, leave the seed at 42 for now.
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+set.seed(42)
+boot_samp_1000 <- gss_sample %>% 
+  rep_sample_n(size = nrow(gss_sample), 
+               reps = 1000, 
+               replace = TRUE)
+```
+:::
+
+::: callout-note
+Note a few important details about the `rep_sample_n` function, and bootstrap sampling in general:
+
+-   `size = nrow(gss_sample)` tells `R` that each bootstrap resample we take has `r nrow(gss_sample)` cases... the size of the original sample.
+-   `reps = 1000` tells `R` to take 1000 bootstrap resamples (each of size 100).
+-   The `replace = TRUE` argument tells `R` that in each bootstrap resample, we can include a row from `gss_sample` multiple times. So if for instance, respondent \# 12 is the first random resample taken here, respondent 12 is still available to be resampled **again** at random. Thus, some people may appear **multiple times** in our bootstrap resample, and some people from the original data set may not appear at all.
+-   We save the results in a data frame `boot_samp_1000`.
+:::
+
+Consider the first six rows of `boot_samp_1000` given below. Note that the `replicate` column labels each bootstrap resample (the first 100 rows are labeled 1, the next 100 rows are labeled 2, etc.)
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+kable(head(boot_samp_1000))
+row1 = nrow(boot_samp_1000)
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 1"}
+How many rows does `boot_samp_1000` have? **Why?**
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 1 Answers"}
+-   There are `r row1` rows in boot_samp_1000, because there are 100 rows for each replicate, and there are 1000 replicates.
+:::
+
+## Step 2: Calculate the Bootstrap Statistic
+
+### Using `rep_sample_n()` to create the bootstrap distribution
+
+Let's say we want to use the bootstrap resample that we just generated to calculate a confidence interval for the population mean $\mu_{tv}$ of `tvhours`. To do so, we need to know the sample mean $\bar{x}$ of `tvhours` **for each of the 1,000 bootstrap resamples**. In this case, the sample mean $\bar{x}$ of `tvhours` for **each bootstrap resample** is our **BOOTSTRAP STATISTIC**. We can calculate that with three lines of code as follows:
+
+::: {.callout-caution icon="false" title="R Code 5"}
+```{r}
+boot_distrib_tv <- boot_samp_1000 %>% 
+  group_by(replicate) %>% 
+  summarize(stat = mean(tvhours))
+# Viewing the data
+kable(head(boot_distrib_tv))
+```
+:::
+
+::: callout-note
+-   The `group_by()` argument tells `R` to take the sample mean of `tvhours` **separately** for each different `replicate` in the bootstrap resample.
+
+-   We put the sample mean for each bootstrap resample in a column called `stat`.
+
+-   This is the ***bootstrap distribution*** for the mean of `tvhours`.
+:::
+
+### Using `infer` to create the bootstrap distribution
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+# infer pipeline
+set.seed(321)
+library(infer)
+boot_dist_tv_infer <- gss_sample %>% 
+  specify(response = tvhours) %>% 
+  generate(reps = 1000, type = "bootstrap") %>% 
+  calculate(stat = "mean")
+#
+kable(head(boot_dist_tv_infer))
+```
+:::
+
+### Using a `for()` loop to create the bootstrap distribution
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+# using a for loop
+set.seed(451)
+B <- 1000
+bs_mean <- numeric(B)
+for(i in 1:B){
+  bss <- sample(gss_sample$tvhours, 
+                size = sum(!is.na(gss_sample$tvhours)), 
+                replace = TRUE)
+  bs_mean[i] <- mean(bss)
+}
+#
+head(bs_mean)
+```
+:::
+
+Take a look at the first six rows from `boot_distrib_tv` we created in **R Code 5** shown below.
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+kable(head(boot_distrib_tv))
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 2"}
+How many values of the bootstrap statistic `stat` are there in the object `boot_distrib_tv`? Please explain **why** there are this many values of the bootstrap statistic.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 2 Answers"}
+-   There are 1000 values of the statistic "stat", because there is only 1 for each replicate, and there are 1000 replicates.
+:::
+
+## Visualizing the Bootstrap Distribution
+
+The bootstrap distribution is shown in @fig-boottvdist. This is a histogram of the `stat` values from `boot_distrib_tv`.
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+#| label: "fig-boottvdist"
+#| fig-cap: "Bootstrap distribution of mean TV hours"
+#| fig-width: 5
+#| fig-height: 3
+ggplot(data = boot_distrib_tv, aes(x = stat)) + 
+  geom_histogram(color = "white", binwidth = 0.25) + 
+  labs(title = "Bootstrap distribution", 
+       x = "boostrap statistic (mean tvhours)")
+```
+:::
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+#| label: "fig-viz"
+#| fig-cap: "Bootstrap distribution computed with `visualize()`"
+#| fig-width: 5
+#| fig-height: 3
+# Or infer pipeline---tibble must come from infer pipeline
+visualize(boot_dist_tv_infer, bins = 9)
+```
+:::
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+#| label: "fig-basehist"
+#| fig-height: 3
+#| fig-width: 5
+#| fig-cap: "Bootstrap distribution of mean TV hours (base R histogram)"
+hist(bs_mean, 
+     breaks = "Scott", 
+     main = "Bootstrap Distribution",
+     xlab = expression(paste(bar(x),"*")), 
+     col = "lightblue")
+```
+:::
+
+## Step 3: CI from a Bootstrap Resample
+
+### CI Using the 95% Rule
+
+We can now use the bootstrap distribution for the sample mean `tvhours` $\bar{x}$ to calculate a 95% confidence interval for the population mean `tvhours` $\mu_{tv}$, using the "95% rule for bell shaped distributions", which states that the middle 95% of values of a bell/normal shaped distribution are between
+
+$$\text{mean} \pm 1.96 \cdot SD$$
+
+::: callout-note
+-   the mean here is the mean of the original sample
+-   the SD here is the standard deviation of the bootstrap distribution, which recall has a special name: the **standard error**.
+:::
+
+We can thus apply the 95% rule, like so:
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+# Note that z_{0.975} = 1.96 
+qnorm(0.975)
+(xbar <- mean(gss_sample$tvhours)) # mean of the original sample
+boot_dist_tv_infer %>% 
+  summarize(se = sd(stat), 
+            lower_ci = xbar - (qnorm(0.975) * se), 
+            upper_ci = xbar + (qnorm(0.975) * se)) -> bnci_tv
+kable(bnci_tv)
+#
+standard_error_ci <- boot_dist_tv_infer %>% 
+  get_confidence_interval(level = 0.95, 
+                          type = "se", 
+                          point_estimate = xbar)
+kable(standard_error_ci)
+```
+:::
+
+## CI Using the Percentile Method
+
+You can also calculate a 95% confidence interval using the percentile method. The logic goes like this:
+
+::: callout-note
+Since our bootstrap resample had 1000 values of `stat`:
+
+-   950 of the `stat` values fall **inside** this 95% confidence interval, i.e. 95%
+-   25 values fall **below** it. i.e. the lower 2.5%
+-   25 values fall **above** it. i.e. the higher 2.5%
+
+totaling 100%.
+:::
+
+We can use **the quantiles** of the bootstrap distribution to find these values as follows:
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+bpci_tv <- boot_dist_tv_infer %>% 
+  summarize(lower_ci = quantile(stat, 0.025), 
+            upper_ci = quantile(stat, 0.975))
+
+kable(bpci_tv)
+# Or using get_confidence_interval()
+boot_dist_tv_infer %>% 
+  get_confidence_interval(level = 0.95, type = "percentile") %>% 
+  kable()
+# Which is really just doing the following:
+PCI <- boot_dist_tv_infer %>% 
+            summarize(lower_ci = quantile(stat, 0.025),
+                      upper_ci = quantile(stat, 0.975))
+kable(PCI)
+```
+:::
+
+::: callout-note
+The Percentile Method
+
+-   Asks `R` to identify the 0.025 quantile of the bootstrap sample means... this is the value **below** which **2.5% of the values of `stat`** fall (or 25 cases in this example... 25/1000 = 0.025)
+-   Asks `R` to identify the 0.975 quantile for the bootstrap sample means... this is the value **above** which the other **2.5% of the values of `stat`** fall (or 25 cases in this example 975/1000 = 0.975)
+-   The middle 95% of the values fall between these two quantiles
+:::
+
+Based on these results, we are 95% confident that the **true mean hours of TV watched** $\mu_{tv}$ in the population is between the lower (`r PCI$lower_ci` hours) and upper (`r PCI$upper_ci` hours) CI endpoints we just calculated.
+
+## Visualizing the Confidence Interval
+
+The bootstrap distribution and the 95% **bootstrap percentile** confidence intervals we just calculated are shown in @fig-bsmtv. @fig-bsmtv is a histogram of the `stat` values from `boot_dist_tv_infer`. The green line is the lower bound of the 95% CI, and the blue line is the upper bound. 950 of the 1000 bootstrap resamples had a mean for `tvhours` that fell **between** the green and blue dashed lines...25 of the samples had a mean above the blue dashed line, and 25 of the samples had a mean below the green dashed line.
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+#| label: "fig-bsmtv"
+#| fig-cap: "Showing the endpoints of a 95% bootstrap percentile CI"
+#| fig-width: 5
+#| fig-height: 3
+ggplot(data = boot_dist_tv_infer, aes(x = stat)) + 
+  geom_histogram(color = "black", fill = "pink", binwidth = 0.15) + 
+  labs(title = "Bootstrap distribution with 95% CI", 
+       x = "boostrap statistic (mean tvhours)") +
+  geom_vline(data = bpci_tv, aes(xintercept = lower_ci), 
+             color = "green", lwd = 1, lty = "dashed") + 
+  geom_vline(data = bpci_tv, aes(xintercept = upper_ci), 
+             color = "blue", lwd = 1, lty = "dashed") +
+  theme_bw()
+```
+:::
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r, fig.height=3, fig.width=5}
+boot_dist_tv_infer %>% visualize() +
+  shade_confidence_interval(endpoints = PCI, color = "red", fill = "pink")
+
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 3"}
+-   **If** we calculated a **90% bootstrap percentile** confidence interval for the mean of `tvhours` using this same bootstrap resample (`boot_dist_tv_infer`) and the percentile method, roughly how many of the 1000 values of `tv_mean` would fall between the `lower_ci` and the `upper_ci`?
+
+-   Programatically count the number of values that actually fall between the computed `lower_ci` and the `upper_ci`.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 3 Answers"}
+-   roughly 900 of the values of tv_mean would fall between 2.56 and 3.77 hours.
+
+```{r}
+# Type your code and comments below
+boot_dist_tv_infer %>% 
+  get_confidence_interval(level = 0.90, type = "percentile") %>% 
+  kable()
+
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 4"}
+Use the bootstrap resampling distribution for `tvhours` generated using the infer pipeline (`boot_dist_tv_infer`) and the **bootstrap percentile** method to calculate a 99% **bootstrap percentile** confidence interval for the mean `tvhours`. Round your answer to two decimal places. Make sure to use inline `R` code to report your answer and include appropriate units with the confidence interval.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 4 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+conf_int_99 <- boot_dist_tv_infer %>%
+  get_confidence_interval(level = 0.99, type = "percentile")
+conf_int_99
+```
+
+-   The 99% confidence interval would fall between the values of `r round(conf_int_99[1, 1], 2)` and `r round(conf_int_99[1, 2], 2)` hours.
+:::
+
+::: {.callout-note icon="false" title="Problem 5"}
+Which confidence interval is **WIDER**: the 95% confidence interval or the 99% confidence interval for the population mean `tvhours` $\mu_{tv}$? Why?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 5 Answers"}
+-   The 99% confidence interval is wider because it needs to account for more possible values with a higher level of confidence.
+:::
+
+::: {.callout-note icon="false" title="Problem 6"}
+-   Use the bootstrap resample we generated using the function `rep_sample_n()` (`boot_samp_1000`) to generate a **bootstrap distribution** for the sample mean respondent `age` instead of `tvhours`. Use a seed of 21. Store your resulting bootstrap distribution in `boot_dist_age1`.
+
+-   Use the `infer` pipeline to generate a **bootstrap distribution** for the sample mean respondent `age` instead of `tvhours`. Use a seed of 21. Store your resulting bootstrap distribution in `boot_dist_age2`. Note: you will need to start with the original sample (`gss_sample`).
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 6 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+set.seed(21)
+boot_dist_age1 <- boot_samp_1000 %>%
+  group_by(replicate) %>%
+  summarize(stat = mean(age))
+
+library(infer)
+boot_dist_age2 <- gss_sample %>%
+  specify(response = age) %>%
+  generate(reps = 1000, type = "bootstrap") %>%
+  calculate(stat = "mean")
+
+kable(head(boot_dist_age1))
+kable(head(boot_dist_age2))
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 7"}
+Calculate 95% confidence intervals for the population mean respondent `age` $\mu_{age}$ using the **95% rule** method with the data in `boot_dist_age1` and `boot_dist_age2`.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 7 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+age1 <- boot_dist_age1 %>%
+  get_confidence_interval(level = 0.95, type = "percentile")
+age1
+
+age2 <- boot_dist_age2 %>%
+  get_confidence_interval(level = 0.95, type = "percentile")
+age2
+```
+
+-   The lower confidence interval for the data in boot_dist_age1 is `r round(age1[1, 1], 2)` years old and the upper confidence interval is `r round(age1[1, 2], 2)` years old.
+
+-   The lower confidence interval for the data in boot_dist_age2 is `r round(age2[1, 1], 2)` years old and the upper confidence interval is `r round(age2[1, 2], 2)` years old.
+:::
+
+::: {.callout-note icon="false" title="Problem 8"}
+Calculate a 95% bootstrap percentile confidence interval for the population mean respondent `age` $\mu_{age}$ using the values in `boot_dist_age1`.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 8 Answers"}
+```{r}
+age1 <- boot_dist_age1 %>%
+  get_confidence_interval(level = 0.95, type = "percentile")
+age1
+```
+
+-   The lower confidence interval for the data in boot_dist_age1 is `r round(age1[1, 1], 2)` years old and the upper confidence interval is `r round(age1[1, 2], 2)` years old.
+:::
+
+::: {.callout-note icon="false" title="Problem 9"}
+How do the 95% confidence intervals you calculated in 7 and 8 compare? i.e. are the 95% CI values similar or are they pretty different?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 9 Answers"}
+-   The confidence interval values are similar.
+:::
+
+::: {.callout-note icon="false" title="Problem 10"}
+Use the **bootstrap resampling distribution** for the sample mean respondent `age` (`boot_dist_age1`) and the percentile method to calculate an 80% confidence interval for the population mean respondent age $\mu_{age}$.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 10 Answers"}
+```{r}
+age3 <- boot_dist_age1 %>%
+  get_confidence_interval(level = 0.8, type = "percentile")
+age3
+
+```
+
+-   The lower confidence interval for the data in boot_dist_age1 is `r round(age3[1, 1], 2)` years old and the upper confidence interval is `r round(age3[1, 2], 2)` years old.
+:::
+
+# Bootstrap Sampling Distribution & Confidence Intervals with Categorical Variables
+
+The procedure for generating a bootstrap sampling distribution is VERY similar for categorical data. As an example we will generate a bootstrap sampling distribution for the proportion of respondents who identified as a Person of Color.
+
+## Step 1: Take 1000 Bootstrap Resamples
+
+We already did this above! We can use the same `boot_samp_1000` as before.
+
+## Step2: Calculate the Bootstrap Statistic $\hat{p}$
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+boot_distrib_POC <- boot_samp_1000 %>% 
+  group_by(replicate) %>% 
+  summarize(n = n(), 
+            POC_count = sum(race == "POC"), 
+            boot_stat = POC_count/n,
+            phat_boot = mean(race == "POC"))
+kable(head(boot_distrib_POC))
+```
+:::
+
+::: callout-note
+Note that with a categorical variable, the code differs in two important respects now:
+
+-   the population parameter that we don't know, but are inferring about via sampling, is now the population proportion $p$ that identify as a POC.
+-   the sample statistic AKA point estimate that we calculate with the summarize command is now the **sample proportion** $\widehat{p}$ rather than a sample mean $\bar{x}$.
+
+To get our proportion $\widehat{p}$ of **ONE** of the race categories (POC), we need to **first** calculate the total sample size for each replicate and the count of how many cases are `race == "POC"` in each replicate.
+:::
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+# Or using infer
+set.seed(32)
+gss_sample %>% 
+  specify(response = race, success = "POC") %>% 
+  generate(reps = 1000, type = "bootstrap") %>% 
+  calculate(stat = "prop") -> boot_dist_POC_infer
+kable(head(boot_dist_POC_infer))
+```
+:::
+
+## Step 3: Generate the 95% Confidence Interval
+
+### CI Using the 95% Rule
+
+The following will calculate the 95% confidence interval for the proportion of people that identified as `POC` using the 95% rule.
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+phat <- mean(gss_sample$race=="POC")
+boot_distrib_POC %>% 
+  summarize(se = sd(boot_stat), 
+            lower_ci = phat - (qnorm(0.975) * se), 
+            upper_ci = phat + (qnorm(0.975) * se)) %>% 
+  kable()
+### Using infer
+boot_dist_POC_infer %>% 
+  get_confidence_interval(level = 0.95, 
+                          type = "se", 
+                          point_estimate = phat) %>% 
+  kable()
+```
+:::
+
+### CI with the Percentile Method
+
+The following will calculate the 95% confidence interval for the proportion of people that identified as "POC" using the percentile method.
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+boot_distrib_POC %>% 
+  summarize(lower_ci = quantile(boot_stat, 0.025), 
+            upper_ci = quantile(boot_stat, 0.975)) %>% 
+  kable()
+### Using infer
+boot_dist_POC_infer %>% 
+  get_confidence_interval(level = 0.95, 
+                          type = "percentile", 
+                          point_estimate = phat) %>% 
+  kable()
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 11"}
+Calculate a 95% CI for the **population proportion** of respondents $p$ who identified as **White** using BOTH the percentile and the 95% rule method. Note that you will first need to generate the bootstrap distribution for the proportion of respondents who identified as `White`. Compute the requested 95% CI using `boot_samp_1000` and by generating the bootstrap distribution using the infer pipeline. Use a seed of 43 for the infer pipeline.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 11 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+
+```
+
+```{r}
+# Type your code and comments inside the code chunk
+# percentile method
+
+```
+
+-   Delete this and put your text answer here.
+
+-   Delete this and put your text answer here.
+
+```{r}
+# Type your code and comments inside the code chunk
+
+# percentile method
+
+# 95% rule
+
+```
+
+-   Delete this and put your text answer here.
+
+-   Delete this and put your text answer here.
+:::
+
+# Confidence Intervals Based on the Theoretical Normal Distribution
+
+As described in [ModernDive Section 8.7.2](https://moderndive.com/8-confidence-intervals.html#theory-ci), not only can we generate confidence intervals using a computer/resampling as we've been doing until now, in many cases there also exists a mathematical formula.
+
+To generate a $(1 - \alpha)\cdot 100$% confidence interval based on the theoretical normal distribution, we can use the following formula:
+
+$$\widehat{\text{point estimate}} \pm z_{1 - \frac{\alpha}{2}} \cdot \widehat{SE}$$
+
+So, for instance if we wanted to calculate the 95% confidence interval for the population mean of `tvhours` $\mu_{tv}$ that respondents watched based on our sample:
+
+-   the **point estimate** AKA **sample statistic** in this case would be the sample mean number of `tvhours` from the sample: $\bar{x}$
+-   We would estimate the standard error using the formula: where $s$ is the **sample standard deviation**, which is a point estimate of the **population standard deviation** $\sigma$:
+
+$$\widehat{SE} \approx \frac{s}{\sqrt{n}}$$
+
+and thus a 95% CI $\rightarrow \alpha = 0.05 \rightarrow z_{1 - \frac{0.05}{2}} \rightarrow z_{0.975} = `r qnorm(0.975)`$ would be
+
+$$
+\bar{x} \pm 1.96 \cdot \widehat{SE} =  \bar{x} \pm 1.96 \cdot \frac{s}{\sqrt{n}}
+$$
+
+We can perform the calculations in `R` as follows:
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+x_bar = mean(gss_sample$tvhours)
+gss_sample %>% 
+  summarize(sd = sd(tvhours), 
+            n = n(), 
+            se = sd/sqrt(n), 
+            lower_ci = x_bar - qnorm(.975) * se, 
+            upper_ci = x_bar + qnorm(.975) * se) -> tci_tv
+kable(tci_tv)
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 12"}
+Write down the three 95% confidence intervals for the population mean of `tvhours` $\mu_{tv}$ you've computed in this problem set. Do this by replacing X, Y, A, B, P, and Q with the appropriate values you've computed.
+
+When you are done, make sure all the `|` in the table still line up so your results print out in a table!
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 12 Answers"}
+| CI construction method          | lower value | upper value |
+|---------------------------------|-------------|-------------|
+| Using bootstrap: 95% rule        | 2.43           | 3.85           |
+| Using bootstrap: percentile rule | 2.48           | 3.92           |
+| Using mathematical formula      | P           | Q           |
+:::
+
+::: {.callout-note icon="false" title="Problem 13"}
+**In your opinion**: would you say these three confidence intervals are similar?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 13 Answers"}
+-   The confidence intervals are all similar.
+:::
+
+# Turning in Your Work
+
+You will need to make sure you commit and push all of your changes to the github education repository where you obtained the lab.
+
+::: callout-tip
+-   Make sure you **render a final copy with all your changes** and work.
+-   Look at your final html file to make sure it contains the work you expect and is formatted properly.
+:::
+
+# Logging out of the Server
+
+There are many statistics classes and students using the Server. To keep the server running as fast as possible, it is best to sign out when you are done. To do so, follow all the same steps for closing Quarto document:
+
+::: callout-tip
+-   Save all your work.
+-   Click on the orange button in the far right corner of the screen to quit `R`
+-   Choose **don't save** for the **Workspace image**
+-   When the browser refreshes, you can click on the sign out next to your name in the top right.
+-   You are signed out.
+:::
+
+```{r}
+sessionInfo()
+```

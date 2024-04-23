@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Max Mathues">
+
+<title>Problem Set 05: Regression with One Categorical Variable</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="PS05_source_files/libs/clipboard/clipboard.min.js"></script>
+<script src="PS05_source_files/libs/quarto-html/quarto.js"></script>
+<script src="PS05_source_files/libs/quarto-html/popper.min.js"></script>
+<script src="PS05_source_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="PS05_source_files/libs/quarto-html/anchor.min.js"></script>
+<link href="PS05_source_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="PS05_source_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="PS05_source_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="PS05_source_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="PS05_source_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="PS05_source.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Problem Set 05: Regression with One Categorical Variable</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Max Mathues </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">Last modified on September 21, 2023 15:26:05 Eastern Daylight Time</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="background" class="level1">
+<h1>Background</h1>
+<p>In this problem set, hate crimes data from the US will be used. The FiveThirtyEight article about the data appears in the Jan 23, 2017 <a href="https://fivethirtyeight.com/features/higher-rates-of-hate-crimes-are-tied-to-income-inequality/">“Higher Rates Of Hate Crimes Are Tied To Income Inequality.”</a></p>
+<p>The crimes data will be used to run regression models with a single categorical predictor (explanatory) variable.</p>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<p>First load the necessary packages:</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(moderndive)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<p>Next, the data is read into the object <code>hate_crimes</code> from where it is stored on the web using the <code>read_csv()</code> function.</p>
+<div class="callout callout-style-default callout-caution no-icon callout-titled" title="R Code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+R Code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">"http://bit.ly/2ItxYg3"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">dir.exists</span>(<span class="st">"./data/"</span>)){</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(<span class="st">"./data/"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"./data/hate_crimes.csv"</span>)){</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">download.file</span>(url, <span class="at">destfile =</span> <span class="st">"./data/hate_crimes.csv"</span>)}</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>hate_crimes <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"./data/hate_crimes.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(hate_crimes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 51
+Columns: 9
+$ state            &lt;chr&gt; "New Mexico", "Maine", "New York", "Illinois", "Delaw…
+$ median_house_inc &lt;chr&gt; "low", "low", "low", "low", "high", "high", "high", "…
+$ share_pop_metro  &lt;dbl&gt; 0.69, 0.54, 0.94, 0.90, 0.90, 1.00, 0.87, 0.86, 0.97,…
+$ hs               &lt;dbl&gt; 83, 90, 85, 86, 87, 85, 89, 90, 81, 91, 89, 89, 87, 8…
+$ hate_crimes      &lt;dbl&gt; 0.295, 0.616, 0.351, 0.195, 0.323, 0.095, 0.833, 0.67…
+$ trump_support    &lt;chr&gt; "low", "low", "low", "low", "low", "low", "low", "low…
+$ unemployment     &lt;chr&gt; "high", "low", "low", "high", "low", "high", "high", …
+$ urbanization     &lt;chr&gt; "low", "low", "high", "high", "high", "high", "high",…
+$ income           &lt;dbl&gt; 46686, 51710, 54310, 54916, 57522, 58633, 58875, 5906…</code></pre>
+</div>
+</div>
+<p>Be sure <strong>ALSO</strong> to examine the data in the viewer.</p>
+<p>Each case/row in these data is a state in the US. The response variable we will consider is <code>hate_crimes</code>, which is the number of hate crimes per 100k individuals in the 10 days after the 2016 US election as measured by the Southern Poverty Law Center (SPLC).</p>
+<p>This week we will use three categorical explanatory variables in this data set:</p>
+<ul>
+<li><p><code>trump_support</code>: level of Trump support in 2016 election (low, medium or high - split into roughly equal number of cases)</p></li>
+<li><p><code>unemployment</code>: level of unemployment in a state (low or high - split below or above mean)</p></li>
+<li><p><code>median_house_inc</code>: median household income in the state (low or high - split below or above median)</p></li>
+</ul>
+</section>
+</section>
+<section id="hate-crimes-and-trump-support" class="level1">
+<h1>Hate Crimes and Trump Support</h1>
+<p>Let’s start by modeling the relationship between:</p>
+<ul>
+<li><p><span class="math inline">\(y\)</span>: <code>hate_crimes</code> per 100K individuals</p></li>
+<li><p><span class="math inline">\(x\)</span>: Level of <code>trump_support</code> in the state: <code>low</code>, <code>medium</code>, or <code>high</code></p></li>
+</ul>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 1">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 1
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Create a visual model of these data (a graph) that will allow you to conduct an “eyeball test” of the relationship between hate crimes per 100K and level of Trump support. Include appropriate axes labels and a title. Please note that because of alphanumeric ordering, the levels of <code>trump_support</code> are ordered <code>high</code>, <code>low</code>, <code>medium</code>, and hence the baseline group is <code>high</code>. Also note that we could “reorder” the levels to <code>low</code>, <code>medium</code>, <code>high</code>….though we will leave the levels as is for this Problem Set.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 1 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 1 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(hate_crimes, <span class="fu">aes</span>(<span class="at">x =</span> trump_support, <span class="at">y =</span> hate_crimes))<span class="sc">+</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="PS05_source_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 2">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 2
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol start="2" type="1">
+<li>Comment on the relationship between <code>hate_crimes</code>, and <code>trump_support</code>. Is this what you would’ve expected?</li>
+</ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 2 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 2 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>I didn’t have any presumptions about what group would commit more hate crimes, but the graph shows that there were higher amounts of hate crimes among people that do not support Trump.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 3">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 3
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Create a model that examines the relationship between hate crime rates and the level of Trump support. Store the results of your model in an object named <code>hate_mod</code>. Generate a regression table using <code>hate_mod</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 3 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 3 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>hate_mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(hate_crimes <span class="sc">~</span> trump_support, <span class="at">data =</span> hate_crimes)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">get_regression_table</span>(hate_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 7
+  term                  estimate std_error statistic p_value lower_ci upper_ci
+  &lt;chr&gt;                    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 intercept                0.191     0.06      3.18    0.003    0.07     0.312
+2 trump_support: low       0.269     0.08      3.36    0.002    0.108    0.43 
+3 trump_support: medium    0.031     0.083     0.376   0.709   -0.137    0.2  </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 4">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 4
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What does the intercept mean in this regression table?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 4 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 4 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>The intercept represents the predicted average of hate crimes per 100,000 people.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 5">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 5
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What does the model estimate as the number of hate crimes per 100,000 people in states with “low” Trump support?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 5 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 5 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>The estimate of hate crimes is .460 per 100,000 people.</li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 6">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 6
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Does the model estimate that hate crimes are more frequent in states that show “low” or “high” support for Trump?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 6 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 6 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>It indicates that they happen more frequently in states with low support</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 7">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 7
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>How much greater were hate crimes in “medium” Trump-support states compared to “high” Trump-support states?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 7 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 7 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>They were .031 higher.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 8">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 8
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What are the three possible fitted values <span class="math inline">\(\hat{y}\)</span> for this model? Hint: use the <code>get_regression_points()</code> function to explore this if you are not sure!</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 8 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 8 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li><p>for low support the y-hat value would be .460</p></li>
+<li><p>for medium support the y-hat value would be .222</p></li>
+<li><p>for high support the y-hat value would be .191</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 9">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 9
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Below we calculate the group means of hate crimes for the <code>high</code>, <code>medium</code> and <code>low</code> levels of Trump support. How do these numbers compare to the three possible fitted values <span class="math inline">\(\widehat{y}\)</span> for this model?</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>hate_crimes <span class="sc">%&gt;%</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">group_by</span>(trump_support) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_hate_crimes =</span> <span class="fu">mean</span>(hate_crimes, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  trump_support mean_hate_crimes
+  &lt;chr&gt;                    &lt;dbl&gt;
+1 high                     0.191
+2 low                      0.460
+3 medium                   0.222</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 9 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 9 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>They match up perfectly.</li>
+</ul>
+</div>
+</div>
+</div>
+<section id="the-regression-equation" class="level2">
+<h2 class="anchored" data-anchor-id="the-regression-equation">The Regression Equation</h2>
+<p>The regression equation for this model is the following (render the document and look at the output!)</p>
+<p><span class="math display">\[
+\widehat{\text{hate\_crimes}} = 0.191 + 0.2691111 \times 1_{\text{low support}}(x) + 0.0314 \times 1_{\text{med support}}(x)
+\]</span></p>
+<p>Another notation is to use a dummy variables (<span class="math inline">\(D_1\)</span>, and <span class="math inline">\(D_2\)</span>) and write the equation as</p>
+<p><span class="math display">\[\widehat{y} = 0.191 + 0.2691111 \times D_1 + 0.0314 \times D_2\]</span> where</p>
+<span class="math display">\[\begin{equation*}
+D_1 =
+\begin{cases}
+1 &amp;\text{for low Trump support}\\
+0 &amp;\text{for medium Trump support}\\
+0 &amp;\text{for high Trump support}
+\end{cases}
+\end{equation*}\]</span>
+<span class="math display">\[\begin{equation*}
+D_2 =
+\begin{cases}
+0 &amp;\text{for low Trump support}\\
+1 &amp;\text{for medium Trump support}\\
+0 &amp;\text{for high Trump support}
+\end{cases}
+\end{equation*}\]</span>
+<p>So for instance, in a state in which <code>trump_support</code> is “low” you would plug in 1 for <span class="math inline">\(1_{\mbox{low support}}(x)\)</span>, and 0 in for <span class="math inline">\(1_{\mbox{med support}}(x)\)</span> and solve as follows:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\widehat{y} &amp;= 0.191 + 0.2691111 \times 1 + 0.0314 \times 0 \\
+\widehat{y} &amp;= 0.191 + 0.2691111 + 0\\
+\widehat{y} &amp;= 0.4601111
+\end{aligned}
+\]</span></p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 10">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 10
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Solve the regression equation for a state in which <code>trump_support</code> is “high”.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 10 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 10 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<p>Your <span class="math inline">\(LaTeX\)</span> here</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>y_hat <span class="ot">=</span> <span class="fl">0.191</span> <span class="sc">+</span> .<span class="dv">2691111</span> <span class="sc">*</span> (<span class="dv">0</span>) <span class="sc">+</span> <span class="fl">0.0314</span> <span class="sc">*</span> (<span class="dv">0</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>y_hat</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.191</code></pre>
+</div>
+</div>
+<ul>
+<li><pre><code>0.191</code></pre></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 11">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 11
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Which 5 states had the highest rate of hate crimes? What was the level of Trump support in these 5 states? Solve this question programmatically. Note: The District of Columbia is not actually a state!</p>
+<p>Do these results surprise you? (There is no right answer to this question.)</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 11 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 11 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>h5 <span class="ot">&lt;-</span> hate_crimes <span class="sc">%&gt;%</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(state, hate_crimes, trump_support) <span class="sc">%&gt;%</span>   <span class="fu">arrange</span>(<span class="fu">desc</span>(hate_crimes))</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(h5)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  state                hate_crimes trump_support
+  &lt;chr&gt;                      &lt;dbl&gt; &lt;chr&gt;        
+1 District of Columbia       1.52  low          
+2 Oregon                     0.833 low          
+3 Washington                 0.677 low          
+4 Massachusetts              0.631 low          
+5 Minnesota                  0.627 low          
+6 Maine                      0.616 low          </code></pre>
+</div>
+</div>
+<ul>
+<li>The 5 states with the highest hate crime rates were Oregon, Washington, Massachusetts, Minnesota, and Maine, which all had low Trump support.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="hate-crimes-and-unemployment" class="level1">
+<h1>Hate Crimes and Unemployment</h1>
+<p>We will next model the relationship between:</p>
+<ul>
+<li><span class="math inline">\(y\)</span>: <code>hate_crimes</code> per 100K individuals after the 2016 US election</li>
+<li><span class="math inline">\(x\)</span>: Level of unemployment in the state (<code>low</code>, or <code>high</code>)</li>
+</ul>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 12">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 12
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Create a visual model of this data (a graph) that will allow you to conduct an “eyeball test” of the relationship between hate crimes per 100K and unemployment level. Include appropriate axes labels and a title.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 12 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 12 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(hate_crimes, <span class="fu">aes</span>(<span class="at">x =</span> unemployment, <span class="at">y =</span> hate_crimes))<span class="sc">+</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()<span class="sc">+</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>( <span class="at">x =</span> <span class="st">"unemployment level"</span>, <span class="at">y =</span> <span class="st">"hate crimes per 100k"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="PS05_source_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 13">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 13
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Create a model that examines the relationship between hate crime rates and the unemployment level. Name this model <code>job_mod</code>. Generate a regression table for <code>job_mod</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 13 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 13 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>job_mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(hate_crimes <span class="sc">~</span> unemployment, <span class="at">data =</span> hate_crimes)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">get_regression_table</span>(job_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 7
+  term              estimate std_error statistic p_value lower_ci upper_ci
+  &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 intercept            0.289     0.052     5.55    0        0.184    0.394
+2 unemployment: low    0.031     0.074     0.421   0.676   -0.118    0.181</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 14">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 14
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Write out the regression equation for <code>job_mod</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 14 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 14 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<p>Write your equation with <span class="math inline">\(LaTeX\)</span> here. y_hat = 0.289 + .031 * (1)</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 15">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 15
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Interpret the estimate of the intercept from the table below.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 15 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 15 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>The intercept represents the average hate crimes per 100k people in high unemployment states.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 16">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 16
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What does the model estimate the number of hate crimes per 100,000 people to be in a state with “low” unemployment?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 16 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-34-contents" aria-controls="callout-34" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 16 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-34" class="callout-34-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>The model estimates there to be an average of .320 hate crimes per 100k people in low unemployment areas.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 17">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 17
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What are the two possible fitted values <span class="math inline">\(\widehat{y}\)</span> for this model? Why are there only two values this time instead of the three like the previous model?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 17 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-36-contents" aria-controls="callout-36" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 17 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-36" class="callout-36-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>There are only two potential y-hat values because the unemployment category is only broken up into high and low instead of low, medium, and high like the previous model. The values will be .320 for low unemployment and .289 for high unemployment.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 18">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 18
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use the <code>get_regression_points()</code> function to generate a table showing the fitted values and the residuals for the model relating <code>hate_crimes</code> to unemployment (<code>job_mod</code>). Examine the first row: How are the residuals calculated here?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 18 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-38-contents" aria-controls="callout-38" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 18 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-38" class="callout-38-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">get_regression_points</span>(job_mod))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+     ID hate_crimes unemployment hate_crimes_hat residual
+  &lt;int&gt;       &lt;dbl&gt; &lt;chr&gt;                  &lt;dbl&gt;    &lt;dbl&gt;
+1     1       0.295 high                   0.289    0.006
+2     2       0.616 low                    0.32     0.296
+3     3       0.351 low                    0.32     0.031
+4     4       0.195 high                   0.289   -0.094
+5     5       0.323 low                    0.32     0.003
+6     6       0.095 high                   0.289   -0.194</code></pre>
+</div>
+</div>
+<ul>
+<li>The residuals are the difference between the predicted and observed values.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="hate-crimes-and-household-income" class="level1">
+<h1>Hate Crimes and Household Income</h1>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 19">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 19
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Create a model that examines the relationship between <code>hate_crimes</code> and median household income in the state <code>median_house_inc</code>. Name the model <code>job_med_mod</code>. Run the function <code>summary()</code> on the model <code>job_med_mod</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 19 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-40-contents" aria-controls="callout-40" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 19 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-40" class="callout-40-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>job_med_mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(hate_crimes <span class="sc">~</span> median_house_inc, <span class="at">data =</span> hate_crimes)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(job_med_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = hate_crimes ~ median_house_inc, data = hate_crimes)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-0.3114 -0.1215 -0.0380  0.0653  1.1326 
+
+Coefficients:
+                    Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)          0.38941    0.05159   7.548 1.58e-09 ***
+median_house_inclow -0.16041    0.07074  -2.268   0.0282 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.242 on 45 degrees of freedom
+  (4 observations deleted due to missingness)
+Multiple R-squared:  0.1025,    Adjusted R-squared:  0.0826 
+F-statistic: 5.142 on 1 and 45 DF,  p-value: 0.02821</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 20">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 20
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Were there more hate crimes in areas with high or low median household incomes? How large was the difference between states with “low” and “high” levels of household income?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 20 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-42-contents" aria-controls="callout-42" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 20 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-42" class="callout-42-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li>There were higher amounts of hate crimes in areas with high median incomes, but the difference was only .16</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 21">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 21
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Show the first six rows of the output created from running the <code>get_regression_points()</code> function on <code>job_med_mod</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 21 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-44-contents" aria-controls="callout-44" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 21 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-44" class="callout-44-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>tib1 <span class="ot">&lt;-</span> <span class="fu">get_regression_points</span>(job_med_mod)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(tib1, <span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+     ID hate_crimes median_house_inc hate_crimes_hat residual
+  &lt;int&gt;       &lt;dbl&gt; &lt;chr&gt;                      &lt;dbl&gt;    &lt;dbl&gt;
+1     1       0.295 low                        0.229    0.066
+2     2       0.616 low                        0.229    0.387
+3     3       0.351 low                        0.229    0.122
+4     4       0.195 low                        0.229   -0.034
+5     5       0.323 high                       0.389   -0.066
+6     6       0.095 high                       0.389   -0.294</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Problem 22">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 22
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Take a look at data for Maine (row 2 of <code>hate_crimes</code>). Did the model (<code>job_med_mod</code>) <strong>overpredict</strong> or <strong>underpredict</strong> the <code>hate_crimes</code> level, compared to what was observed in the data?</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important no-icon callout-titled" title="Problem 22 Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-46-contents" aria-controls="callout-46" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Problem 22 Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-46" class="callout-46-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type your code and comments inside the code chunk</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>The model underpredicted the hate crimes level.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="extra" class="level1">
+<h1><strong>EXTRA</strong></h1>
+<p><a href="#fig-extra">Figure&nbsp;1</a> reorders the levels of the variable <code>trump_support</code> using the <code>fct_relevel()</code> function from the <code>forcats</code> package then displays the data with side-by-side boxplots.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reordering trump_support</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forcats)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>hate_crimes <span class="ot">&lt;-</span> hate_crimes <span class="sc">%&gt;%</span> </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">trump_support =</span> <span class="fu">fct_relevel</span>(trump_support, </span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">"low"</span>, <span class="st">"medium"</span>, <span class="st">"high"</span>))</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> hate_crimes, <span class="fu">aes</span>(<span class="at">x =</span> trump_support, <span class="at">y =</span> hate_crimes)) <span class="sc">+</span> </span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="fu">rainbow</span>(<span class="dv">3</span>)) <span class="sc">+</span> </span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Voter Support of Trump"</span>, </span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Number of Hate Crimes per 100K people"</span>, </span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Hate Crimes in relation to Trump Support"</span>) <span class="sc">+</span> </span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-extra" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="PS05_source_files/figure-html/fig-extra-1.png" class="img-fluid figure-img" width="768"></p>
+<figcaption class="figure-caption">Figure&nbsp;1: Hate crimes in relation to Trump support</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="turning-in-your-work" class="level1">
+<h1>Turning in Your Work</h1>
+<p>You will need to make sure you commit and push all of your changes to the github education repository where you obtained the lab.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Make sure you <strong>render a final copy with all your changes</strong> and work.</li>
+<li>Look at your final html file to make sure it contains the work you expect and is formatted properly.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="logging-out-of-the-server" class="level1">
+<h1>Logging out of the Server</h1>
+<p>There are many statistics classes and students using the Server. To keep the server running as fast as possible, it is best to sign out when you are done. To do so, follow all the same steps for closing Quarto document:</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Save all your work.</li>
+<li>Click on the orange button in the far right corner of the screen to quit <code>R</code></li>
+<li>Choose <strong>don’t save</strong> for the <strong>Workspace image</strong></li>
+<li>When the browser refreshes, you can click on the sign out next to your name in the top right.</li>
+<li>You are signed out.</li>
+</ul>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.2.3 (2023-03-15)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Red Hat Enterprise Linux 9.2 (Plow)
+
+Matrix products: default
+BLAS/LAPACK: /usr/lib64/libopenblasp-r0.3.21.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] forcats_1.0.0    readr_2.1.4      moderndive_0.5.5 dplyr_1.1.3     
+[5] ggplot2_3.4.3    knitr_1.44      
+
+loaded via a namespace (and not attached):
+ [1] tidyselect_1.2.0     xfun_0.40            janitor_2.2.0       
+ [4] purrr_1.0.2          operator.tools_1.6.3 snakecase_0.11.1    
+ [7] colorspace_2.1-0     vctrs_0.6.3          generics_0.1.3      
+[10] htmltools_0.5.6      yaml_2.3.7           utf8_1.2.3          
+[13] rlang_1.1.1          pillar_1.9.0         glue_1.6.2          
+[16] withr_2.5.0          infer_1.0.5          bit64_4.0.5         
+[19] lifecycle_1.0.3      stringr_1.5.0        munsell_0.5.0       
+[22] gtable_0.3.4         htmlwidgets_1.6.2    evaluate_0.21       
+[25] labeling_0.4.3       tzdb_0.4.0           fastmap_1.1.1       
+[28] parallel_4.2.2       fansi_1.0.4          broom_1.0.5         
+[31] backports_1.4.1      scales_1.2.1         vroom_1.6.3         
+[34] jsonlite_1.8.7       farver_2.1.1         bit_4.0.5           
+[37] hms_1.1.3            digest_0.6.33        stringi_1.7.12      
+[40] formula.tools_1.7.1  grid_4.2.2           cli_3.6.1           
+[43] tools_4.2.2          magrittr_2.0.3       tibble_3.2.1        
+[46] crayon_1.5.2         tidyr_1.3.0          pkgconfig_2.0.3     
+[49] ellipsis_0.3.2       lubridate_1.9.2      timechange_0.2.0    
+[52] rmarkdown_2.24       rstudioapi_0.15.0    R6_2.5.1            
+[55] compiler_4.2.2      </code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

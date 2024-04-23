@@ -1,0 +1,412 @@
+---
+title: "Problem Set 06"
+author: "Your Name"
+date: last-modified
+date-format: "[Last modified on] MMMM DD, YYYY HH:mm:ss zzz"
+format: 
+  html: default
+  pdf: default
+editor: visual
+---
+
+```{r include = FALSE}
+# Do not edit this code block/chunk!
+library(knitr)
+library(scales)
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center", comment = NA, message = FALSE,  warning = FALSE, fig.width = 16/2, fig.height = 9/2)
+```
+
+# Background
+
+We will again use the hate crimes data we used in Problem Set 05. The FiveThirtyEight article about those data are in the Jan 23, 2017 ["Higher Rates Of Hate Crimes Are Tied To Income Inequality."](https://fivethirtyeight.com/features/higher-rates-of-hate-crimes-are-tied-to-income-inequality/) This week, we will use these data to run regression models with a single categorical predictor (explanatory) variable **and** a single numeric predictor (explanatory) variable.
+
+## Setup
+
+First load the necessary packages:
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+library(ggplot2)
+library(dplyr)
+library(moderndive)
+library(readr)
+```
+:::
+
+The following code uses the function `read_csv()` to read in the data and store the information in an object named `hate_crimes`.
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+url <- "http://bit.ly/2ItxYg3"
+if(!dir.exists("./data/")){
+  dir.create("./data/")
+  }
+if(!file.exists("./data/hate_crimes.csv")){
+    download.file(url, destfile = "./data/hate_crimes.csv")
+  }
+hate_crimes <- read_csv("./data/hate_crimes.csv")
+```
+:::
+
+Next, let's explore the `hate_crimes` data set using the `glimpse()` function from the `dplyr` package:
+
+```{r}
+glimpse(hate_crimes)
+```
+
+You should also examine the data in the **data viewer**.
+
+Each case/row in these data is a state in the US. This week we will consider the response variable `income`, which is the numeric variable of median income of households in each state.
+
+We will use
+
+-   A categorical explanatory variable `urbanization`: level of urbanization in a region
+-   A numerical explanatory variable `share_pop_hs`: the percentage of adults 25 and older with a high school degree
+
+## Income, Education and Urbanization
+
+We will start by modeling the relationship between:
+
+-   $y$: Median household income in 2016
+-   $x_1$: numerical variable percent of adults 25 and older with a high-school degree, contained in the `hs` variable\
+-   $x_2$: categorical variable level of urbanization in a state: `low`, or `high`, as contained in the variable `urbanization`
+
+# Exploratory Data Analysis
+
+We will start by creating a scatterplot showing:
+
+-   Median household `income` on the $y$ axis
+-   Percent of adults 25 or older with a high school degree on the $x$ axis
+-   The points colored by the variable `urbanization`
+-   A line of best fit (regression line) for each level of the variable `urbanization` (one for "low", one for "high")
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+#| label: fig-urb
+#| fig-cap: "Median household income versus percent of adults with high-school degree in states with differing levels of urbanization"
+ggplot(data = hate_crimes, aes(y = income, x = hs, color = urbanization)) +
+  geom_point()+ 
+  geom_smooth(method = "lm", se = FALSE) + 
+  labs(
+    x = "Percent of adults with high-school degree", 
+    y = "Median household income in USD $", 
+    title = "Income versus education in states with differing levels of urbanization") + 
+  theme_bw() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 1"}
+Do you think the relationship between `hs` and `income` is strong or weak, linear or non-linear in @fig-urb?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 1 Answers"}
+-   There appears to be a fairly strong linear relationship between household income and the percentage of adults  with high school degrees.
+:::
+
+::: {.callout-note icon="false" title="Problem 2"}
+Which regression line (high `urbanization` or low `urbanization`) in @fig-urb has the larger intercept? Answer the question using the actual intercepts from the statistical model. Store the results of the `lm()` function in `mod_full` using the appropriate predictors to obtain the regression models depicted in @fig-urb. Use either `kable()` from the `knitr` package or `get_regression_table()` from the `moderndive` package on `mod_full`. Make sure to format the intercepts in your answer using appropriate units.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 2 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+mod_full <- lm(income ~ hs*urbanization, data = hate_crimes)
+data1 <- get_regression_table(mod_full)
+data1
+```
+
+-   High urbanization has the lower intercept at `r data1[1,2]` than low urbanization does at `r data1[3,2]`
+:::
+
+::: {.callout-note icon="false" title="Problem 3"}
+Does the slope look fairly similar (parallel) for the two levels of urbanization?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 3 Answers"}
+-   The slopes are very different with the slope for high urbanization being `r data1[2,2]` and the slope for low urbanization being `r data1[4,2]`
+:::
+
+::: {.callout-note icon="false" title="Problem 4"}
+Based on the data visualization in @fig-urb, and your answer to 3, do you think it would be best to run a "parallel slopes" model (i.e. a model that estimates one shared slope for the two levels of urbanization), or a more complex "interaction model" (i.e. a model that estimates a separate slope for the two levels of urbanization)?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 4 Answers"}
+-   I think it would be better to run a model that shares the slope
+
+```{r}
+# Type your code and comments inside the code chunk
+
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 5"}
+Create a data visualization comparing median household income at "low" and "high" levels of urbanization (you do not need to include the `hs` variable in this plot). Please include axis labels and and title.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 5 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+ggplot(data = hate_crimes, aes(x = urbanization, y = income, fill = urbanization)) + geom_boxplot()+ labs(title = "Median household income vs. urbanization.", x = "Urbanization", y = "Median household income") + theme_bw()
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 6"}
+Run a linear regression model that examines the relationship between household `income` (as response variable), and high-school education (`hs`), and `urbanization` as explanatory variables. Store the results of your model in an object named `med_income_model`. Generate the regression table using the `get_regression_table()` function from the `moderndive` package. Create a graph of the equations stored in `med_income_model`. Use appropriate labels for the $x-$ and $y-$ axes as well as a title in your graph.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 6 Answers"}
+```{r}
+library(scales)  # Used to format numbers and for dollars
+# Type your code and comments inside the code chunk
+med_income_model <- lm(income ~ hs+urbanization, data = hate_crimes)
+data2 <- get_regression_table(med_income_model)
+data2
+```
+
+```{r}
+# Type your code and comments here
+ggplot(data = hate_crimes, aes(x = hs, y = income, color = urbanization)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) + 
+  labs(title = "Income vs. Education Levels", x = "Adults with HS degree", y = "Median household income") + 
+  theme_bw()
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 7"}
+Is the intercept the same for the states with a "low" and "high" level of urbanization? Is the slope the same? (look at the data visualization created in Problem 6 to help with this!)
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 7 Answers"}
+-   The intercept is different for both levels of urbanization, but the slope is the same.
+:::
+
+::: {.callout-note icon="false" title="Problem 8"}
+What is the slope for the regression line of the states with a "high" level of urbanization? What is the intercept? Be sure to format your answers with appropriate units.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 8 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+
+```
+
+-   The intercept for the high level regression line was `r data2[1,2]`
+
+-   the slope for the high level regression line was `r data2[2,2]`
+:::
+
+::: {.callout-note icon="false" title="Problem 9"}
+What is the slope for the regression line of the states with a "low" level of urbanization? What is the intercept? Be sure to format your answers with appropriate units.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 9 Answers"}
+-   The intercept for the low level regression line was `r data2[3,2]` + `r data2[1,2]`
+
+-   The slope for the high level regression line was `r data2[2,2]`
+:::
+
+::: {.callout-note icon="false" title="Problem 10"}
+Based on your regression table output (and the data visualizations), is median household income greater in states that have lower or higher levels of urbanization? By how much? Be sure to format your answer with appropriate units.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 10 Answers"}
+-   Based on the boxplot created earlier, the median income is higher in high urbanization states.
+:::
+
+::: {.callout-note icon="false" title="Problem 11"}
+For every increase in 1 percentage point of high-school educated adults, what is the associated increase in the median household income of a state? Be sure to format your answer with appropriate units.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 11 Answers"}
+-   for high urbanization states, the increase is by`r data1[2,2]` dollars and for low urbanization states the increase is by `r data1[4,2]` dollars.
+:::
+
+::: {.callout-note icon="false" title="Problem 12"}
+The regression equation for `med_income_model` is given below. Write the regression equation for a US state in which `urbanization` is "high".
+
+```{r, echo = FALSE}
+med_income_model <- lm(income ~ hs + urbanization, data = hate_crimes)
+med_income_model
+```
+
+$$\widehat{\text{income}} = `r comma(coef(summary(med_income_model))[1])` + `r round(coef(summary(med_income_model))[2],2)` \times \text{hs}  `r round(coef(summary(med_income_model))[3],2)` \times 1_{\text{low urbanization}}(\text{x})$$
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 12 Answers"}
+-   Your $LaTeX$ answer here.
+$$\widehat{\text{income}} = `r comma(coef(summary(med_income_model))[1])` + `r round(coef(summary(med_income_model))[2],2)` \times \text{hs}  `r round(coef(summary(med_income_model))[1],2)` \times 1_{\text{high urbanization}}(\text{x})$$
+:::
+
+::: {.callout-note icon="false" title="Problem 13"}
+What would you predict as the median household income for a state with a **high** level of urbanization, in which 85% of the share of adults have a high school degree? Be sure to format your answer with appropriate units.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 13 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+income1 <- -113725.193 + 1986.794 * 85
+income1
+```
+
+-   I would predict the median household income with low levels of urbanization to be `r income1`
+:::
+
+::: {.callout-note icon="false" title="Problem 14"}
+What would you predict as the median household income for a state with a **low** level of urbanization, in which 85% of the share of adults have a high school degree? Be sure to format your answer with appropriate units.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 14 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+income2 <- (-113725.193+-7333.326) + 1986.794 * 85
+income2
+```
+
+-   I would predict the median household income with low levels of urbanization to be `r income2`
+:::
+
+::: {.callout-note icon="false" title="Problem 15"}
+What would you predict as the median household income for a state with a **low** level of urbanization, in which 30% of adults have a high school degree?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 15 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+income3 <- (-113725.193+-7333.326) + 1986.794 * 30
+income3
+```
+-   I would predict the median household income with low levels of urbanization to be `r income3`
+:::
+
+::: {.callout-note icon="false" title="Problem 16"}
+What was the observed `income` value for Maine (row 2)? What was the prediction for Maine according to our model (`med_income_model`)? What is the residual? Did our model over or underestimate the median income for this state? Be sure to format your answers with appropriate units.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 16 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+hate_crimes %>%
+  filter(state == "Maine")
+y_hat = -121058.519 + 1986.794 * 90
+y_hat
+get_regression_table(med_income_model)
+```
+
+-   income value was low.
+
+-   `r y_hat`
+
+-   `r 51710 -y_hat`
+
+-   Our model overestimated the income in Maine
+:::
+
+# Independent Analysis
+
+```{r, echo = FALSE, out.width=600}
+#| label: "fig-VOLE"
+#| fig-cap: "Vole in the wild"
+knitr::include_graphics("https://ptes.org/wp-content/uploads/2017/11/water-vole-credit-Iain-Green-www.wildwonder.co_.uk-2_cropped.jpg")
+
+```
+
+You will now use the tools you have learned, and a new data set to solve a conservation problem.
+
+Wildlife biologists are interested in managing/protecting habitats for a declining species of vole, but are not sure about what habitats it prefers. Two things that biologists can easily control with management is percent cover of vegetation, and where habitat improvements occur (i.e. is it important to create/protect habitat in moist or dry sites, etc). To help inform habitat management of this vole species, the researchers in this study counted the number of `voles` at 56 random study sites. At each site, they measured percent cover of `veg`etation, and recorded whether a site had moist or dry `soil`.
+
+The data are read into the object `vole_trapping` using the `read_csv()` function below.
+
+::: {.callout-caution icon="false" title="R Code"}
+```{r}
+url <- "http://bit.ly/2IgDF0E"
+if(!dir.exists("./data/")){
+  dir.create("./data/")
+  }
+if(!file.exists("./data/vole_trapping.csv")){
+    download.file(url, destfile = "./data/vole_trapping.csv")
+  }
+vole_trapping <- read_csv("./data/vole_trapping.csv")
+```
+:::
+
+The data contains the variables:
+
+-   `site` for the id of each random study site (each case or row is a survey/trapping site)
+-   `voles` for the vole count at each site
+-   `veg` for the percent cover of vegetation at each site
+-   `soil` identifying a site as "moist" or "dry"
+
+::: {.callout-note icon="false" title="Problem 17"}
+Generate a regression model with `voles` as the response variable `y` and `veg` and `soil` as explanatory variables. Store the model in an object named `voles_mod`. Use the results of the model to answer the following questions **based on the available data**. Create a data visualization (parallel slopes) to help answer the questions.
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 17 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+voles_mod <- lm(voles ~ veg + soil, data = vole_trapping)
+summary(voles_mod)
+```
+:::
+
+::: {.callout-note icon="false" title="Problem 18"}
+Would you recommend to a manager that they try to protect sites with high or low vegetation cover? Why?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 18 Answers"}
+-   In order to support a higher population of voles, we would want to have the manager protect the high vegetation sites.
+:::
+
+::: {.callout-note icon="false" title="Problem 19"}
+Dry sites are typically a lot less money to purchase and maintain for conservation organizations. Thus, if a conservation organization decides to purchase a few dry sites, roughly what percent cover of vegetation do they need to maintain on these sites (at a minimum) to support a population of about 30 voles at the site?
+:::
+```{r}
+# Type your code and comments inside the code chunk
+min_veg <- (30 - coef(voles_mod)[1] - coef(voles_mod)[3]) / coef(voles_mod)[2]
+min_veg
+```
+::: {.callout-important icon="false" collapse="false" title="Problem 19 Answers"}
+-   we would need roughly `r min_veg`% of vegetation cover
+
+
+:::
+
+::: {.callout-note icon="false" title="Problem 20"}
+The Nature Conservancy is looking at purchasing a site for this species (in the same study area) that has moist soil and 40% vegetation cover. **Using the regression equation** what would you predict as the possible vole population the site might be able to support?
+:::
+
+::: {.callout-important icon="false" collapse="false" title="Problem 20 Answers"}
+```{r}
+# Type your code and comments inside the code chunk
+vole_prediction <- predict(voles_mod, newdata = data.frame(veg = 40, soil = "moist"))
+
+```
+
+-   I would predict the vole population to be around `r vole_prediction`
+:::
+
+# Turning in Your Work
+
+You will need to make sure you commit and push all of your changes to the github education repository where you obtained the lab.
+
+::: callout-tip
+-   Make sure you **render a final copy with all your changes** and work.
+-   Look at your final html file to make sure it contains the work you expect and is formatted properly.
+:::
+
+# Logging out of the Server
+
+There are many statistics classes and students using the Server. To keep the server running as fast as possible, it is best to sign out when you are done. To do so, follow all the same steps for closing Quarto document:
+
+::: callout-tip
+-   Save all your work.
+-   Click on the orange button in the far right corner of the screen to quit `R`
+-   Choose **don't save** for the **Workspace image**
+-   When the browser refreshes, you can click on the sign out next to your name in the top right.
+-   You are signed out.
+:::
+
+```{r}
+sessionInfo()
+```
